@@ -1,0 +1,73 @@
+import type { ExtractedField } from '../types';
+
+const sampleReviewData: ExtractedField[] = [
+  {
+    fieldName: 'expiryInfo',
+    fieldValue: { date: '2024-12-31', place: 'New York' },
+    refDocuments: [
+      {
+        docName: 'doc123.pdf',
+        refContent: 'expiry date and place',
+        bboxes: [{ pageIndex: 0, boxes: [[100, 200, 150, 250]] }],
+      },
+      {
+        docName: 'doc456.pdf',
+        refContent: 'expiry information including date and location',
+        bboxes: [{ pageIndex: 1, boxes: [[200, 300, 250, 350]] }],
+      },
+    ],
+    refRegulations: [
+      {
+        docName: 'INCOTERMS 2020',
+        refContent: 'Expiry information must include date and place.',
+        regulationCode: 'Article 6',
+        sectionType: 'Clause',
+        sectionNumber: '6.1',
+        pages: [10, 11],
+        bboxes: [
+          { pageIndex: 10, boxes: [[50, 100, 200, 150]] },
+          { pageIndex: 11, boxes: [[60, 110, 210, 160]] },
+        ],
+      },
+      {
+        docName: 'UCC Article 2',
+        refContent: 'The expiry information must specify the date and place of expiration.',
+        regulationCode: 'Section 2-309',
+        sectionType: 'Article',
+        sectionNumber: '2-309',
+        pages: [5],
+        bboxes: [{ pageIndex: 5, boxes: [[30, 80, 180, 130]] }],
+      },
+    ],
+    issue: 'The expiry information is incomplete as it does not specify the date and place of expiration.',
+    recommendation: 'Update to include both the date and place of expiration to comply with the relevant regulations.',
+    status: 'CRITICAL',
+  },
+  {
+    fieldName: 'paymentTerms',
+    fieldValue: 'Net 30',
+    refDocuments: [
+      {
+        docName: 'doc789.pdf',
+        refContent: 'payment terms specified as Net 30',
+        bboxes: [{ pageIndex: 2, boxes: [[150, 250, 200, 300]] }],
+      },
+    ],
+    refRegulations: [
+      {
+        docName: 'INCOTERMS 2020',
+        refContent: 'Payment terms should be clearly defined and specify the time frame for payment.',
+        regulationCode: 'Article 7',
+        sectionType: 'Clause',
+        sectionNumber: '7.1',
+        pages: [12],
+        bboxes: [{ pageIndex: 12, boxes: [[70, 120, 220, 170]] }],
+      },
+    ],
+    issue: null,
+    recommendation: null,
+    status: 'INFO',
+  },
+];
+
+export default sampleReviewData;
