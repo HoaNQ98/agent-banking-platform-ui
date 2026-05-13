@@ -3,6 +3,7 @@ import { Layout } from 'antd';
 import { useAppStore } from '../../store/useAppStore';
 import { LAYOUT } from '../../constants';
 import { isMobileDevice } from '../../utils';
+import { useConversationRoute } from '../../hooks/useConversationRoute';
 import Sidebar from '../sidebar/Sidebar';
 import ChatSection from '../chat/ChatSection';
 import FormBuilder from '../form-builder/FormBuilder';
@@ -12,6 +13,7 @@ import Header from './Header';
 const { Sider, Content } = Layout;
 
 const MainLayout: React.FC = () => {
+  useConversationRoute();
   const { uiState, reviewData, setMobile, setSidebarOpen, setFormBuilderOpen } = useAppStore();
   const { isSidebarOpen, isFormBuilderOpen, isMobile } = uiState;
 

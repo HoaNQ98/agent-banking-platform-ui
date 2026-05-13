@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Typography } from 'antd';
 import { RobotOutlined, PlusOutlined, FileSearchOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import { CONVERSATION_STARTERS } from '../../constants';
 import sampleReviewData from '../../data/sampleReviewData';
@@ -8,7 +9,13 @@ import sampleReviewData from '../../data/sampleReviewData';
 const { Title, Text } = Typography;
 
 const EmptyChat: React.FC = () => {
+  const navigate = useNavigate();
   const { createConversation, setReviewData, setFormBuilderOpen } = useAppStore();
+
+  const handleNewConversation = () => {
+    const id = createConversation();
+    navigate(`/c/${id}`);
+  };
 
   const handleOpenReviewDemo = () => {
     setReviewData(sampleReviewData);
@@ -16,9 +23,7 @@ const EmptyChat: React.FC = () => {
   };
 
   const handleStarterClick = (_starter: string) => {
-    createConversation();
-    // After creating conversation, we could auto-fill the input with the starter text
-    // This would require additional state management or a callback
+    handleNewConversation();
   };
 
   return (
@@ -107,7 +112,7 @@ const EmptyChat: React.FC = () => {
               type="primary"
               size="large"
               icon={<PlusOutlined />}
-              onClick={createConversation}
+              onClick={handleNewConversation}
               style={{ borderRadius: '8px', height: '48px', padding: '0 32px' }}
             >
               Start New Conversation

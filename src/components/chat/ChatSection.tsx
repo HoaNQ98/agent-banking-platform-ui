@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { Spin } from 'antd';
 import { useAppStore } from '../../store/useAppStore';
 import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
@@ -6,7 +7,7 @@ import ChatInput from './ChatInput';
 import EmptyChat from './EmptyChat';
 
 const ChatSection: React.FC = () => {
-  const { activeConversationId, messages } = useAppStore();
+  const { activeConversationId, messages, isLoadingHistory } = useAppStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const currentMessages = activeConversationId ? messages[activeConversationId] || [] : [];
@@ -41,7 +42,25 @@ const ChatSection: React.FC = () => {
         }}
       >
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
-          <MessageList messages={currentMessages} />
+          {isLoadingHistory ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '12px',
+                height: '200px',
+                color: '#8c8c8c',
+                fontSize: '14px',
+              }}
+            >
+              <Spin size="large" />
+              Loading conversation...
+            </div>
+          ) : (
+            <MessageList messages={currentMessages} />
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>

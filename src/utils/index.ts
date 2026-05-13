@@ -11,15 +11,18 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format timestamp to relative time
  */
-export function formatRelativeTime(date: Date): string {
-  return formatDistanceToNow(date, { addSuffix: true });
+export function formatRelativeTime(date: Date | string | null | undefined): string {
+  if (!date) return '';
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return '';
+  return formatDistanceToNow(d, { addSuffix: true });
 }
 
 /**
- * Generate unique ID
+ * Generate a UUID v4 string, compatible with backend UUID fields.
  */
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return crypto.randomUUID();
 }
 
 /**

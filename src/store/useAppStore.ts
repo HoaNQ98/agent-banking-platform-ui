@@ -3,10 +3,26 @@ import { devtools } from 'zustand/middleware';
 import type { AppState, Conversation, Message, FormData, ExtractedField, AgentStatus } from '../types';
 import { generateId } from '../utils';
 import { DEFAULT_MESSAGES } from '../constants';
+import { ConversationService } from '../api/services/conversations';
+import type { ConversationItem } from '../api/types';
 
-interface AppStore extends AppState {
+interface ConversationListState {
+  remoteConversations: ConversationItem[];
+  conversationPage: number;
+  conversationHasMore: boolean;
+  isLoadingConversations: boolean;
+  isLoadingHistory: boolean;
+}
+
+interface AppStore extends AppState, ConversationListState {
+  // Remote conversation list actions
+  fetchConversations: (page?: number) => Promise<void>;
+  fetchConversationMessages: (conversationId: string) => Promise<void>;
+  prependRemoteConversation: (item: ConversationItem) => void;
+  setMessages: (conversationId: string, messages: Message[]) => void;
+
   // Conversation Actions
-  createConversation: () => void;
+  createConversation: () => string;
   setActiveConversation: (id: string) => void;
   updateConversationTitle: (id: string, title: string) => void;
   deleteConversation: (id: string) => void;
@@ -42,7 +58,7 @@ interface AppStore extends AppState {
   reset: () => void;
 }
 
-const initialState: AppState = {
+const initialState: AppState & ConversationListState = {
   conversations: [],
   activeConversationId: null,
   messages: {},
@@ -57,12 +73,94 @@ const initialState: AppState = {
     name: 'Banking Assistant',
     status: 'online',
   },
+  remoteConversations: [],
+  conversationPage: 0,
+  conversationHasMore: true,
+  isLoadingConversations: false,
+  isLoadingHistory: false,
 };
 
 export const useAppStore = create<AppStore>()(
   devtools(
     (set) => ({
       ...initialState,
+
+      // Remote conversation list actions
+      fetchConversations: async (page?: number) => {
+        const { isLoadingConversations, conversationHasMore, conversationPage } =
+          useAppStore.getState();
+        const nextPage = page ?? conversationPage + 1;
+
+        if (isLoadingConversations || (!conversationHasMore && page === undefined)) return;
+
+        set({ isLoadingConversations: true });
+        try {
+          const res = await ConversationService.listConversations(nextPage);
+          const { data, meta } = res;
+          set((state) => ({
+            remoteConversations:
+              nextPage === 1 ? data : [...state.remoteConversations, ...data],
+            conversationPage: nextPage,
+            conversationHasMore: meta.pagination.hasNext,
+          }));
+        } catch (err) {
+          console.error('Failed to fetch conversations:', err);
+        } finally {
+          set({ isLoadingConversations: false });
+        }
+      },
+
+      fetchConversationMessages: async (conversationId: string) => {
+        // Skip if already loaded or currently loading
+        const { messages, isLoadingHistory } = useAppStore.getState();
+        if (isLoadingHistory || messages[conversationId] !== undefined) return;
+
+        set({ isLoadingHistory: true });
+        try {
+          const res = await ConversationService.getMessages(conversationId);
+          const mapped: Message[] = res.data.map((item) => ({
+            id: item.id,
+            role: item.role === 'user' ? 'user' : 'agent',
+            content: item.content ?? '',
+            type: (item.artifact?.type === 'form' ? 'form-trigger' : 'text') as Message['type'],
+            timestamp: new Date(item.createdAt),
+            attachments: item.attachments?.map((a) => ({
+              id: a.file_id,
+              name: a.file_name,
+              type: a.file_type ?? '',
+              size: 0,
+              url: a.file_path,
+            })),
+            metadata: item.artifact ? { artifact: item.artifact } : undefined,
+          }));
+          set((state) => ({
+            messages: { ...state.messages, [conversationId]: mapped },
+          }));
+        } catch (err) {
+          console.error('Failed to fetch conversation history:', err);
+          // Set empty array so we don't retry on every click
+          set((state) => ({
+            messages: { ...state.messages, [conversationId]: [] },
+          }));
+        } finally {
+          set({ isLoadingHistory: false });
+        }
+      },
+
+      setMessages: (conversationId: string, messages: Message[]) => {
+        set((state) => ({
+          messages: { ...state.messages, [conversationId]: messages },
+        }));
+      },
+
+      prependRemoteConversation: (item: ConversationItem) => {
+        set((state) => ({
+          remoteConversations: [
+            item,
+            ...state.remoteConversations.filter((c) => c.id !== item.id),
+          ],
+        }));
+      },
 
       // Conversation Actions
       createConversation: () => {
@@ -75,7 +173,6 @@ export const useAppStore = create<AppStore>()(
         };
 
         set((state) => {
-          // Set all other conversations to inactive
           const updatedConversations = state.conversations.map((conv) => ({
             ...conv,
             isActive: false,
@@ -98,6 +195,8 @@ export const useAppStore = create<AppStore>()(
             },
           };
         });
+
+        return newConversation.id;
       },
 
       setActiveConversation: (id: string) => {

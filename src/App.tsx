@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import MainLayout from './components/layout/MainLayout';
 
@@ -36,7 +37,11 @@ const theme = {
 const App: React.FC = () => {
   return (
     <ConfigProvider theme={theme}>
-      <MainLayout />
+      <Routes>
+        <Route path="/" element={<MainLayout />} />
+        <Route path="/c/:conversationId" element={<MainLayout />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </ConfigProvider>
   );
 };
