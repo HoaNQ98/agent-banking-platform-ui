@@ -32,7 +32,7 @@ export interface UploadedFileInfo {
  * Input for creating a conversation message
  */
 export interface ConversationInput {
-  conversation_id: string;
+  conversation_id: string; // UUID v4
   role: string; // 'user' | 'assistant' | 'system'
   message: string;
   files?: FileUpload[];
@@ -153,4 +153,62 @@ export interface ConversationResponse {
 export interface APIError {
   detail: string;
   status?: number;
+}
+
+/**
+ * A single conversation entry from the list API
+ */
+export interface ConversationItem {
+  id: string;
+  firstMessage: string;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface ListConversationsResponse {
+  status: string;
+  data: ConversationItem[];
+  meta: {
+    pagination: PaginationMeta;
+  };
+}
+
+/**
+ * A single attachment reference stored on a message
+ */
+export interface AttachmentInfo {
+  file_id: string;
+  file_name: string;
+  file_path: string;
+  file_type?: string;
+}
+
+/**
+ * A single message from the history endpoint
+ */
+export interface ConversationMessageItem {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string | null;
+  attachments: AttachmentInfo[] | null;
+  artifact: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export interface ListConversationMessagesResponse {
+  status: string;
+  data: ConversationMessageItem[];
+  meta: {
+    pagination: PaginationMeta;
+  };
 }

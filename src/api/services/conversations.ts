@@ -11,6 +11,8 @@ import type {
   ConversationInput,
   ConversationResponse,
   ConversationStreamEvent,
+  ListConversationsResponse,
+  ListConversationMessagesResponse,
 } from '../types';
 
 /**
@@ -190,6 +192,22 @@ export const ConversationService = {
       onError?.(err);
       throw err;
     }
+  },
+
+  /**
+   * Fetch a paginated list of conversations for the sidebar
+   */
+  async listConversations(page = 1, perPage = 20): Promise<ListConversationsResponse> {
+    const url = getApiUrl(`/conversations?page=${page}&per_page=${perPage}`);
+    return client.get<ListConversationsResponse>(url);
+  },
+
+  /**
+   * Fetch paginated message history for a conversation
+   */
+  async getMessages(conversationId: string, page = 1, perPage = 50): Promise<ListConversationMessagesResponse> {
+    const url = getApiUrl(`/conversations/${conversationId}/messages?page=${page}&per_page=${perPage}`);
+    return client.get<ListConversationMessagesResponse>(url);
   },
 
   /**

@@ -30,7 +30,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
     uploadedFiles: [],
   });
 
-  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking } = useAppStore();
+  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking, messages, prependRemoteConversation } = useAppStore();
   const currentMessageIdRef = useRef<string | null>(null);
   const accumulatedTextRef = useRef<string>('');
   const isThinkingStartedRef = useRef<boolean>(false);
@@ -271,6 +271,19 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
           attachments: userAttachments,
         });
 
+        // On first user message, optimistically prepend to the sidebar list
+        const existingMessages = messages[conversationId] ?? [];
+        const isFirstUserMessage = !existingMessages.some((m) => m.role === 'user');
+        if (isFirstUserMessage) {
+          prependRemoteConversation({
+            id: conversationId,
+            firstMessage: message,
+            isArchived: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: null,
+          });
+        }
+
         // Create a loading placeholder until first text arrives
         const agentMessage = addMessage(conversationId, {
           role: 'agent',
@@ -323,7 +336,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
         }
       }
     },
-    [resetState, addMessage, updateMessage, handleStreamEvent, options]
+    [resetState, addMessage, updateMessage, handleStreamEvent, messages, prependRemoteConversation, options]
   );
 
   return {
