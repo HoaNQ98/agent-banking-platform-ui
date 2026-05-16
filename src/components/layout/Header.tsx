@@ -1,22 +1,14 @@
 import React from 'react';
 import { Layout, Button } from 'antd';
-import { MenuOutlined, FileTextOutlined } from '@ant-design/icons';
+import { MenuOutlined } from '@ant-design/icons';
 import { useAppStore } from '../../store/useAppStore';
 import { LAYOUT } from '../../constants';
-import { useSampleFormData } from '../../hooks/useSampleData';
 
 const { Header: AntHeader } = Layout;
 
 const Header: React.FC = () => {
-  const { toggleSidebar, toggleFormBuilder, uiState, setFormBuilderOpen } = useAppStore();
-  const { isSidebarOpen, isFormBuilderOpen, isMobile } = uiState;
-  const { generateSampleLoanForm, setCurrentForm } = useSampleFormData();
-
-  const handleDemoForm = () => {
-    const sampleForm = generateSampleLoanForm();
-    setCurrentForm(sampleForm);
-    setFormBuilderOpen(true);
-  };
+  const { toggleSidebar, uiState } = useAppStore();
+  const { isSidebarOpen, isMobile } = uiState;
 
   return (
     <AntHeader
@@ -35,7 +27,7 @@ const Header: React.FC = () => {
         justifyContent: 'space-between',
       }}
     >
-      {/* Left Section - Sidebar Toggle */}
+      {/* Left Section - Sidebar Toggle + Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px' }}>
         <Button
           type="text"
@@ -49,19 +41,14 @@ const Header: React.FC = () => {
             transition: 'all 0.3s',
           }}
           onMouseEnter={(e) => {
-            if (!isSidebarOpen) {
-              e.currentTarget.style.backgroundColor = '#f5f5f5';
-            }
+            if (!isSidebarOpen) e.currentTarget.style.backgroundColor = '#f5f5f5';
           }}
           onMouseLeave={(e) => {
-            if (!isSidebarOpen) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
+            if (!isSidebarOpen) e.currentTarget.style.backgroundColor = 'transparent';
           }}
           aria-label="Toggle sidebar"
         />
 
-        {/* Logo and Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div
             style={{
@@ -77,75 +64,20 @@ const Header: React.FC = () => {
             <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>BA</span>
           </div>
           {!isMobile && (
-            <h1
-              style={{
-                fontSize: '18px',
-                fontWeight: 600,
-                color: '#262626',
-                margin: 0,
-              }}
-            >
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#262626', margin: 0 }}>
               Banking Agent Assistant
             </h1>
           )}
         </div>
       </div>
 
-      {/* Right Section - Form Builder Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '12px' }}>
-        {/* Demo Form Button */}
-        {!isMobile && (
-          <Button onClick={handleDemoForm} type="default">
-            Demo Form
-          </Button>
-        )}
-
-        {/* Security Badge */}
-        {!isMobile && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '13px',
-              color: '#595959',
-            }}
-          >
-            <span style={{ color: '#52c41a' }}>🔒</span>
-            <span>Secure & Encrypted</span>
-          </div>
-        )}
-
-        {/* Form Builder Toggle */}
-        <Button
-          type="text"
-          icon={<FileTextOutlined style={{ fontSize: 18 }} />}
-          onClick={toggleFormBuilder}
-          style={{
-            padding: isMobile ? '8px' : '8px 12px',
-            borderRadius: '6px',
-            backgroundColor: isFormBuilderOpen ? '#e6f7ff' : 'transparent',
-            color: isFormBuilderOpen ? '#1890ff' : '#595959',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.3s',
-          }}
-          onMouseEnter={(e) => {
-            if (!isFormBuilderOpen) {
-              e.currentTarget.style.backgroundColor = '#f5f5f5';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isFormBuilderOpen) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
-          }}
-          aria-label="Toggle form builder"
-        >
-          {!isMobile && <span style={{ fontSize: '14px' }}>Form Builder</span>}
-        </Button>
-      </div>
+      {/* Right Section - Security Badge */}
+      {!isMobile && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#595959' }}>
+          <span style={{ color: '#52c41a' }}>🔒</span>
+          <span>Secure & Encrypted</span>
+        </div>
+      )}
     </AntHeader>
   );
 };

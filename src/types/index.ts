@@ -115,13 +115,13 @@ export interface RefRegulation {
   bboxes: BoundingBox[];
 }
 
-export type FieldStatus = 'CRITICAL' | 'WARNING' | 'INFO';
+export type FieldStatus = 'CRITICAL' | 'WARNING' | 'INFO' | 'OK';
 
 export interface ExtractedField {
   fieldName: string;
   fieldValue: unknown;
-  refDocuments: RefDocument[];
-  refRegulations: RefRegulation[];
+  refDocuments: RefDocument[] | null;
+  refRegulations: RefRegulation[] | null;
   issue: string | null;
   recommendation: string | null;
   status: FieldStatus;
@@ -154,7 +154,6 @@ export interface AppState {
   conversations: Conversation[];
   activeConversationId: string | null;
   messages: Record<string, Message[]>; // Keyed by conversation ID
-  currentForm: FormData | null;
   reviewData: ExtractedField[] | null;
   uiState: UIState;
   agentInfo: AgentInfo;

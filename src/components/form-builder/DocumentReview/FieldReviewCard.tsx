@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { Tag, Typography, Button } from 'antd';
+import React from 'react';
+import { Tag, Typography, Collapse } from 'antd';
 import {
   WarningOutlined,
   BulbOutlined,
   FileTextOutlined,
   ReadOutlined,
-  DownOutlined,
-  UpOutlined,
 } from '@ant-design/icons';
 import type { ExtractedField, ActiveSource, FieldStatus } from '../../../types';
 
@@ -19,9 +17,10 @@ interface FieldReviewCardProps {
 }
 
 const STATUS_CONFIG: Record<FieldStatus, { label: string; color: string; bg: string }> = {
-  CRITICAL: { label: 'Needs Attention', color: '#ff4d4f', bg: '#fff2f0' },
-  WARNING:  { label: 'Review Suggested', color: '#faad14', bg: '#fffbe6' },
-  INFO:     { label: 'Looks Good', color: '#52c41a', bg: '#f6ffed' },
+  CRITICAL: { label: 'Must Fix',      color: '#ff4d4f', bg: '#fff2f0' },
+  WARNING:  { label: 'Should Fix',    color: '#faad14', bg: '#fffbe6' },
+  INFO:     { label: 'Best Practice', color: '#1890ff', bg: '#e6f7ff' },
+  OK:       { label: 'No Issue',      color: '#52c41a', bg: '#f6ffed' },
 };
 
 function toLabel(camelCase: string): string {
@@ -31,168 +30,179 @@ function toLabel(camelCase: string): string {
     .trim();
 }
 
-function renderValue(val: unknown): string {
-  if (val === null || val === undefined) return '—';
-  if (typeof val === 'object') {
-    return Object.entries(val as Record<string, unknown>)
-      .map(([k, v]) => `${toLabel(k)}: ${v}`)
-      .join('  ·  ');
+function FieldValue({ value }: { value: unknown }) {
+  if (value === null || value === undefined) {
+    return <Text type="secondary" style={{ fontSize: 13 }}>—</Text>;
   }
-  return String(val);
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return <Text type="secondary" style={{ fontSize: 13 }}>—</Text>;
+    return (
+      <ul style={{ margin: '4px 0 0', paddingLeft: 16 }}>
+        {value.map((item, i) => (
+          <li key={i} style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', marginBottom: 2 }}>
+            {String(item)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>).filter(([, v]) => v !== null && v !== undefined);
+    if (entries.length === 0) return <Text type="secondary" style={{ fontSize: 13 }}>—</Text>;
+    return (
+      <table style={{ marginTop: 4, borderCollapse: 'collapse', width: '100%' }}>
+        <tbody>
+          {entries.map(([k, v]) => (
+            <tr key={k}>
+              <td style={{ paddingRight: 12, paddingBottom: 2, verticalAlign: 'top', whiteSpace: 'nowrap' }}>
+                <Text type="secondary" style={{ fontSize: 12 }}>{toLabel(k)}</Text>
+              </td>
+              <td style={{ paddingBottom: 2 }}>
+                <Text style={{ fontSize: 13, color: '#262626' }}>{String(v)}</Text>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
+  return (
+    <Text style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+      {String(value)}
+    </Text>
+  );
 }
 
 const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSourceClick }) => {
-  const [expanded, setExpanded] = useState(false);
   const config = STATUS_CONFIG[field.status];
-  const hasIssue = !!field.issue;
-  const totalSources = field.refDocuments.length + field.refRegulations.length;
+  const refDocs = field.refDocuments ?? [];
+  const refRegs = field.refRegulations ?? [];
+  const totalSources = refDocs.length + refRegs.length;
+
+  const hasDetails = !!field.issue || !!field.recommendation || totalSources > 0;
+
+  const cardHeader = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Text strong style={{ fontSize: 13 }}>{toLabel(field.fieldName)}</Text>
+        {totalSources > 0 && (
+          <Text type="secondary" style={{ fontSize: 11, marginLeft: 'auto', flexShrink: 0 }}>
+            {totalSources} source{totalSources > 1 ? 's' : ''}
+          </Text>
+        )}
+      </div>
+      <FieldValue value={field.fieldValue} />
+    </div>
+  );
+
+  const detailsContent = (
+    <div style={{ paddingTop: 4 }}>
+      {field.issue && (
+        <div
+          style={{
+            background: config.bg,
+            border: `1px solid ${config.color}20`,
+            borderRadius: 6,
+            padding: '10px 12px',
+            marginBottom: 10,
+          }}
+        >
+          <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
+            <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
+            <Text strong style={{ fontSize: 13, color: config.color }}>Issue</Text>
+          </div>
+          <Text style={{ fontSize: 13, color: '#595959' }}>{field.issue}</Text>
+        </div>
+      )}
+
+      {field.recommendation && (
+        <div
+          style={{
+            background: '#e6f7ff',
+            border: '1px solid #91d5ff',
+            borderRadius: 6,
+            padding: '10px 12px',
+            marginBottom: 10,
+          }}
+        >
+          <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
+            <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
+            <Text strong style={{ fontSize: 13, color: '#1890ff' }}>Suggestion</Text>
+          </div>
+          <Text style={{ fontSize: 13, color: '#595959' }}>{field.recommendation}</Text>
+        </div>
+      )}
+
+      {totalSources > 0 && (
+        <div>
+          <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>
+            Sources — click to view in document
+          </Text>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {refDocs.map((doc, i) =>
+              (doc.bboxes ?? []).map((bbox, j) => (
+                <Tag
+                  key={`doc-${i}-${j}`}
+                  icon={<FileTextOutlined />}
+                  color="default"
+                  style={{ cursor: 'pointer', fontSize: 12 }}
+                  onClick={() =>
+                    onSourceClick({ docName: doc.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes })
+                  }
+                >
+                  {doc.docName} p.{bbox.pageIndex + 1}
+                </Tag>
+              ))
+            )}
+            {refRegs.map((reg, i) =>
+              (reg.bboxes ?? []).map((bbox, j) => (
+                <Tag
+                  key={`reg-${i}-${j}`}
+                  icon={<ReadOutlined />}
+                  color="processing"
+                  style={{ cursor: 'pointer', fontSize: 12 }}
+                  onClick={() =>
+                    onSourceClick({ docName: reg.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes })
+                  }
+                >
+                  {reg.regulationCode} {reg.sectionNumber}
+                </Tag>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div
-      style={{
-        border: `1px solid ${isActive ? config.color : '#e8e8e8'}`,
-        borderLeft: `3px solid ${config.color}`,
-        borderRadius: 8,
-        background: '#fff',
-        marginBottom: 12,
-        transition: 'border-color 0.2s',
-      }}
-    >
-      {/* Card header — always visible */}
-      <div
-        style={{
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 12,
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <Text strong style={{ fontSize: 14 }}>
-              {toLabel(field.fieldName)}
-            </Text>
-            <Tag
-              style={{
-                color: config.color,
-                background: config.bg,
-                border: `1px solid ${config.color}`,
-                fontSize: 11,
-                padding: '0 6px',
-                borderRadius: 4,
-              }}
-            >
-              {config.label}
-            </Tag>
-          </div>
-          <Text style={{ fontSize: 13, color: '#595959' }}>{renderValue(field.fieldValue)}</Text>
-        </div>
-
-        <Button
-          type="text"
+    <div style={{ marginBottom: 12 }}>
+      {hasDetails ? (
+        <Collapse
           size="small"
-          icon={expanded ? <UpOutlined /> : <DownOutlined />}
-          onClick={() => setExpanded((v) => !v)}
-          style={{ color: '#8c8c8c', flexShrink: 0 }}
+          style={{
+            borderLeft: `3px solid ${config.color}`,
+            borderRadius: 8,
+            background: '#fff',
+            outline: isActive ? `1px solid ${config.color}` : undefined,
+          }}
+          items={[{ key: 'detail', label: cardHeader, children: detailsContent }]}
+        />
+      ) : (
+        <div
+          style={{
+            border: '1px solid #e8e8e8',
+            borderLeft: `3px solid ${config.color}`,
+            borderRadius: 8,
+            background: '#fff',
+            padding: '12px 16px',
+            outline: isActive ? `1px solid ${config.color}` : undefined,
+          }}
         >
-          {totalSources > 0 ? `${totalSources} source${totalSources > 1 ? 's' : ''}` : ''}
-        </Button>
-      </div>
-
-      {/* Expanded content */}
-      {expanded && (
-        <div style={{ padding: '0 16px 14px' }}>
-          {/* Issue */}
-          {hasIssue && (
-            <div
-              style={{
-                background: config.bg,
-                border: `1px solid ${config.color}20`,
-                borderRadius: 6,
-                padding: '10px 12px',
-                marginBottom: 10,
-              }}
-            >
-              <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
-                <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
-                <Text strong style={{ fontSize: 13, color: config.color }}>
-                  Issue
-                </Text>
-              </div>
-              <Text style={{ fontSize: 13, color: '#595959' }}>{field.issue}</Text>
-            </div>
-          )}
-
-          {/* Recommendation */}
-          {field.recommendation && (
-            <div
-              style={{
-                background: '#e6f7ff',
-                border: '1px solid #91d5ff',
-                borderRadius: 6,
-                padding: '10px 12px',
-                marginBottom: 10,
-              }}
-            >
-              <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
-                <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
-                <Text strong style={{ fontSize: 13, color: '#1890ff' }}>
-                  Suggestion
-                </Text>
-              </div>
-              <Text style={{ fontSize: 13, color: '#595959' }}>{field.recommendation}</Text>
-            </div>
-          )}
-
-          {/* Sources */}
-          {totalSources > 0 && (
-            <div>
-              <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>
-                Sources — click to view in document
-              </Text>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {field.refDocuments.map((doc, i) =>
-                  doc.bboxes.map((bbox, j) => (
-                    <Tag
-                      key={`doc-${i}-${j}`}
-                      icon={<FileTextOutlined />}
-                      color="default"
-                      style={{ cursor: 'pointer', fontSize: 12 }}
-                      onClick={() =>
-                        onSourceClick({
-                          docName: doc.docName,
-                          pageIndex: bbox.pageIndex,
-                          boxes: bbox.boxes,
-                        })
-                      }
-                    >
-                      {doc.docName}  p.{bbox.pageIndex + 1}
-                    </Tag>
-                  ))
-                )}
-                {field.refRegulations.map((reg, i) =>
-                  reg.bboxes.map((bbox, j) => (
-                    <Tag
-                      key={`reg-${i}-${j}`}
-                      icon={<ReadOutlined />}
-                      color="processing"
-                      style={{ cursor: 'pointer', fontSize: 12 }}
-                      onClick={() =>
-                        onSourceClick({
-                          docName: reg.docName,
-                          pageIndex: bbox.pageIndex,
-                          boxes: bbox.boxes,
-                        })
-                      }
-                    >
-                      {reg.regulationCode}  {reg.sectionNumber}
-                    </Tag>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
+          {cardHeader}
         </div>
       )}
     </div>

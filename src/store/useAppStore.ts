@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { AppState, Conversation, Message, FormData, ExtractedField, AgentStatus } from '../types';
+import type { AppState, Conversation, Message, ExtractedField, AgentStatus } from '../types';
 import { generateId } from '../utils';
 import { DEFAULT_MESSAGES } from '../constants';
 import { ConversationService } from '../api/services/conversations';
@@ -37,16 +37,11 @@ interface AppStore extends AppState, ConversationListState {
   appendThinking: (conversationId: string, messageId: string, text: string) => void;
   completeThinking: (conversationId: string, messageId: string) => void;
 
-  // Form Actions
-  setCurrentForm: (form: FormData | null) => void;
-  updateFormField: (fieldId: string, value: unknown) => void;
-
   // Review Actions
   setReviewData: (data: ExtractedField[] | null) => void;
 
   // UI Actions
   toggleSidebar: () => void;
-  toggleFormBuilder: () => void;
   setSidebarOpen: (isOpen: boolean) => void;
   setFormBuilderOpen: (isOpen: boolean) => void;
   setMobile: (isMobile: boolean) => void;
@@ -62,7 +57,6 @@ const initialState: AppState & ConversationListState = {
   conversations: [],
   activeConversationId: null,
   messages: {},
-  currentForm: null,
   reviewData: null,
   uiState: {
     isSidebarOpen: true,
@@ -133,7 +127,7 @@ export const useAppStore = create<AppStore>()(
                 size: 0,
                 url: a.file_path,
               })),
-              metadata: readyArtifact ? { artifact: readyArtifact.data, artifactId: readyArtifact.id } : undefined,
+              metadata: readyArtifact ? { artifact: readyArtifact.data, artifactId: readyArtifact.id, artifactType: readyArtifact.artifactType } : undefined,
             };
           });
           set((state) => ({
@@ -372,39 +366,14 @@ export const useAppStore = create<AppStore>()(
         }));
       },
 
-      // Form Actions
-      setCurrentForm: (form: FormData | null) => {
-        set({ currentForm: form });
-      },
-
       setReviewData: (data: ExtractedField[] | null) => {
         set({ reviewData: data });
-      },
-
-      updateFormField: (fieldId: string, value: unknown) => {
-        set((state) => {
-          if (!state.currentForm) return state;
-          return {
-            currentForm: {
-              ...state.currentForm,
-              fields: state.currentForm.fields.map((field) =>
-                field.id === fieldId ? { ...field, defaultValue: value as string | number } : field
-              ),
-            },
-          };
-        });
       },
 
       // UI Actions
       toggleSidebar: () => {
         set((state) => ({
           uiState: { ...state.uiState, isSidebarOpen: !state.uiState.isSidebarOpen },
-        }));
-      },
-
-      toggleFormBuilder: () => {
-        set((state) => ({
-          uiState: { ...state.uiState, isFormBuilderOpen: !state.uiState.isFormBuilderOpen },
         }));
       },
 
