@@ -6,7 +6,6 @@ import { isMobileDevice } from '../../utils';
 import { useConversationRoute } from '../../hooks/useConversationRoute';
 import Sidebar from '../sidebar/Sidebar';
 import ChatSection from '../chat/ChatSection';
-import FormBuilder from '../form-builder/FormBuilder';
 import DocumentReviewPanel from '../form-builder/DocumentReview/DocumentReviewPanel';
 import Header from './Header';
 
@@ -14,7 +13,7 @@ const { Sider, Content } = Layout;
 
 const MainLayout: React.FC = () => {
   useConversationRoute();
-  const { uiState, reviewData, setMobile, setSidebarOpen, setFormBuilderOpen } = useAppStore();
+  const { uiState, reviewData, setMobile, setSidebarOpen } = useAppStore();
   const { isSidebarOpen, isFormBuilderOpen, isMobile } = uiState;
 
   const isReviewOpen = isFormBuilderOpen && !!reviewData;
@@ -118,54 +117,6 @@ const MainLayout: React.FC = () => {
           {isReviewOpen && <DocumentReviewPanel />}
         </div>
 
-        {/* Standard FormBuilder side panel (non-review forms) */}
-        {!isReviewOpen && !isMobile && isFormBuilderOpen && (
-          <Sider
-            width={LAYOUT.FORM_BUILDER_WIDTH}
-            style={{
-              background: '#fff',
-              borderLeft: '1px solid #f0f0f0',
-              overflow: 'auto',
-              flexShrink: 0,
-            }}
-          >
-            <FormBuilder />
-          </Sider>
-        )}
-
-        {/* Standard FormBuilder mobile overlay */}
-        {!isReviewOpen && isMobile && isFormBuilderOpen && (
-          <>
-            <div
-              style={{
-                position: 'fixed',
-                top: LAYOUT.HEADER_HEIGHT,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0,0,0,0.45)',
-                zIndex: 999,
-              }}
-              onClick={() => setFormBuilderOpen(false)}
-            />
-            <Sider
-              width={LAYOUT.FORM_BUILDER_WIDTH}
-              style={{
-                position: 'fixed',
-                top: LAYOUT.HEADER_HEIGHT,
-                right: 0,
-                bottom: 0,
-                background: '#fff',
-                borderLeft: '1px solid #f0f0f0',
-                overflow: 'auto',
-                zIndex: 1000,
-                boxShadow: '-2px 0 8px rgba(0,0,0,0.15)',
-              }}
-            >
-              <FormBuilder />
-            </Sider>
-          </>
-        )}
       </Layout>
     </Layout>
   );

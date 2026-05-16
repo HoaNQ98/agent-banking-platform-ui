@@ -203,6 +203,13 @@ export const ArtifactType = {
 export type ArtifactTypeValue = typeof ArtifactType[keyof typeof ArtifactType];
 
 /**
+ * Human-readable button labels for each artifact type shown in the chat.
+ */
+export const ArtifactTypeLabel: Record<ArtifactTypeValue, string> = {
+  lc_form_advisory: 'Review LC Form Advisory',
+};
+
+/**
  * Artifact status constants — mirrors backend ArtifactStatus
  */
 export const ArtifactStatus = {

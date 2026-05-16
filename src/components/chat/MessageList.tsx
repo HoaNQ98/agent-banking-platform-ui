@@ -1,9 +1,11 @@
 import React from 'react';
 import { Typography, Button } from 'antd';
-import { FileOutlined, FormOutlined, FileSearchOutlined } from '@ant-design/icons';
+import { FileOutlined, FileSearchOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import type { Message, ExtractedField } from '../../types';
 import { formatRelativeTime, getFileIcon } from '../../utils';
 import { useAppStore } from '../../store/useAppStore';
+import { ArtifactTypeLabel } from '../../api/types';
+import type { ArtifactTypeValue } from '../../api/types';
 import MarkdownMessage from './MarkdownMessage';
 import ThinkingPanel from './ThinkingPanel';
 
@@ -206,31 +208,63 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                   </div>
                 )}
 
-                {/* Form Trigger Button */}
-                {isFormTrigger && !message.metadata?.reviewData && (
-                  <Button
-                    type="primary"
-                    icon={<FormOutlined />}
-                    onClick={() => setFormBuilderOpen(true)}
-                    style={{ marginTop: '8px' }}
-                  >
-                    View Form Builder →
-                  </Button>
-                )}
-
-                {/* Document Review Trigger */}
-                {isFormTrigger && message.metadata?.reviewData && (
-                  <Button
-                    type="primary"
-                    icon={<FileSearchOutlined />}
+                {/* Artifact Review Trigger */}
+                {isFormTrigger && message.metadata?.artifact && (
+                  <div
                     onClick={() => {
-                      setReviewData(message.metadata!.reviewData as ExtractedField[]);
+                      const fields = (message.metadata!.artifact as Record<string, unknown>).fields as ExtractedField[];
+                      setReviewData(fields);
                       setFormBuilderOpen(true);
                     }}
-                    style={{ marginTop: '8px' }}
+                    style={{
+                      marginTop: '12px',
+                      padding: '12px 16px',
+                      borderRadius: '12px',
+                      background: 'rgba(255, 255, 255, 0.55)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      boxShadow: '0 2px 12px rgba(102, 126, 234, 0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.75)';
+                      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(102, 126, 234, 0.2), inset 0 1px 0 rgba(255,255,255,0.8)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(102, 126, 234, 0.4)';
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.55)';
+                      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(102, 126, 234, 0.1), inset 0 1px 0 rgba(255,255,255,0.6)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                    }}
                   >
-                    Review Extracted Data →
-                  </Button>
+                    <div
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        boxShadow: '0 2px 6px rgba(102, 126, 234, 0.35)',
+                      }}
+                    >
+                      <FileSearchOutlined style={{ color: '#fff', fontSize: '15px' }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '12px', color: '#8c8c8c', lineHeight: '1.3' }}>Document</div>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#262626', lineHeight: '1.4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {ArtifactTypeLabel[message.metadata.artifactType as ArtifactTypeValue] ?? 'Review Artifact'}
+                      </div>
+                    </div>
+                    <ArrowRightOutlined style={{ color: '#667eea', fontSize: '13px', flexShrink: 0 }} />
+                  </div>
                 )}
               </>
             )}
