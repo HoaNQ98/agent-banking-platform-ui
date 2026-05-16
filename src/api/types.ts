@@ -194,6 +194,50 @@ export interface AttachmentInfo {
 }
 
 /**
+ * Artifact type constants — mirrors backend ArtifactType
+ */
+export const ArtifactType = {
+  LC_FORM_ADVISORY: 'lc_form_advisory',
+} as const;
+
+export type ArtifactTypeValue = typeof ArtifactType[keyof typeof ArtifactType];
+
+/**
+ * Artifact status constants — mirrors backend ArtifactStatus
+ */
+export const ArtifactStatus = {
+  PENDING: 'pending',
+  GENERATING: 'generating',
+  READY: 'ready',
+  FAILED: 'failed',
+} as const;
+
+export type ArtifactStatusValue = typeof ArtifactStatus[keyof typeof ArtifactStatus];
+
+/**
+ * A single artifact attached to a message
+ */
+export interface ArtifactItem {
+  id: string;
+  messageId: string;
+  conversationId: string;
+  artifactType: ArtifactTypeValue;
+  status: ArtifactStatusValue;
+  data: Record<string, unknown> | null;
+  error: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+/**
+ * Request body for POST /messages/{messageId}/artifact
+ */
+export interface ArtifactGenerateRequest {
+  conversationId: string;
+  artifactType: ArtifactTypeValue;
+}
+
+/**
  * A single message from the history endpoint
  */
 export interface ConversationMessageItem {
@@ -201,7 +245,7 @@ export interface ConversationMessageItem {
   role: 'user' | 'assistant';
   content: string | null;
   attachments: AttachmentInfo[] | null;
-  artifact: Record<string, unknown> | null;
+  artifacts: ArtifactItem[] | null;
   createdAt: string;
 }
 
@@ -211,4 +255,12 @@ export interface ListConversationMessagesResponse {
   meta: {
     pagination: PaginationMeta;
   };
+}
+
+/**
+ * Response for POST /messages/{messageId}/artifact
+ */
+export interface ArtifactGenerateResponse {
+  status: string;
+  data: ArtifactItem;
 }

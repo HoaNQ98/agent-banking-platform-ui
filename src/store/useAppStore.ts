@@ -118,21 +118,24 @@ export const useAppStore = create<AppStore>()(
         set({ isLoadingHistory: true });
         try {
           const res = await ConversationService.getMessages(conversationId);
-          const mapped: Message[] = res.data.map((item) => ({
-            id: item.id,
-            role: item.role === 'user' ? 'user' : 'agent',
-            content: item.content ?? '',
-            type: (item.artifact?.type === 'form' ? 'form-trigger' : 'text') as Message['type'],
-            timestamp: new Date(item.createdAt),
-            attachments: item.attachments?.map((a) => ({
-              id: a.file_id,
-              name: a.file_name,
-              type: a.file_type ?? '',
-              size: 0,
-              url: a.file_path,
-            })),
-            metadata: item.artifact ? { artifact: item.artifact } : undefined,
-          }));
+          const mapped: Message[] = res.data.map((item) => {
+            const readyArtifact = item.artifacts?.find((a) => a.status === 'ready') ?? null;
+            return {
+              id: item.id,
+              role: item.role === 'user' ? 'user' : 'agent',
+              content: item.content ?? '',
+              type: (readyArtifact?.artifactType === 'lc_form_advisory' ? 'form-trigger' : 'text') as Message['type'],
+              timestamp: new Date(item.createdAt),
+              attachments: item.attachments?.map((a) => ({
+                id: a.file_id,
+                name: a.file_name,
+                type: a.file_type ?? '',
+                size: 0,
+                url: a.file_path,
+              })),
+              metadata: readyArtifact ? { artifact: readyArtifact.data, artifactId: readyArtifact.id } : undefined,
+            };
+          });
           set((state) => ({
             messages: { ...state.messages, [conversationId]: mapped },
           }));
