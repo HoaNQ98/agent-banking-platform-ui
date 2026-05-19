@@ -209,11 +209,14 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 )}
 
                 {/* Artifact Review Trigger */}
-                {isFormTrigger && message.metadata?.artifact && (
+                {isFormTrigger && message.metadata?.artifactId && (
                   <div
                     onClick={() => {
-                      const fields = (message.metadata!.artifact as Record<string, unknown>).fields as ExtractedField[];
-                      setReviewData(fields);
+                      const artifactData = message.metadata?.artifact as Record<string, unknown> | undefined;
+                      const fields = artifactData?.fields as ExtractedField[] | undefined;
+                      if (fields) {
+                        setReviewData(fields);
+                      }
                       setFormBuilderOpen(true);
                     }}
                     style={{

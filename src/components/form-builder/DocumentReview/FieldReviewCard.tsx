@@ -150,7 +150,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
                   color="default"
                   style={{ cursor: 'pointer', fontSize: 12 }}
                   onClick={() =>
-                    onSourceClick({ docName: doc.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes })
+                    onSourceClick({ docName: doc.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes, sourceType: 'document' })
                   }
                 >
                   {doc.docName} p.{bbox.pageIndex + 1}
@@ -165,7 +165,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
                   color="processing"
                   style={{ cursor: 'pointer', fontSize: 12 }}
                   onClick={() =>
-                    onSourceClick({ docName: reg.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes })
+                    onSourceClick({ docName: reg.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes, sourceType: 'regulation' })
                   }
                 >
                   {reg.regulationCode} {reg.sectionNumber}

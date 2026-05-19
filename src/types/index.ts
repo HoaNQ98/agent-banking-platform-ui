@@ -131,6 +131,7 @@ export interface ActiveSource {
   docName: string;
   pageIndex: number;
   boxes: number[][];
+  sourceType: 'document' | 'regulation';
 }
 
 // UI State Types
