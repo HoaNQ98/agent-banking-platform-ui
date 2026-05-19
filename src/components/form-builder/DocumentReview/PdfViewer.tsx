@@ -1,68 +1,100 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FileTextOutlined } from '@ant-design/icons';
-import { Typography } from 'antd';
+import { Typography, Spin } from 'antd';
+import * as pdfjsLib from 'pdfjs-dist';
 import type { ActiveSource } from '../../../types';
+import { getRegulationPath } from '../../../constants';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).href;
 
 const { Text } = Typography;
+
+const HIGHLIGHT_COLOR = 'rgba(250, 173, 20, 0.45)';
+const HIGHLIGHT_BORDER = 'rgba(250, 173, 20, 0.9)';
 
 interface PdfViewerProps {
   activeSource: ActiveSource | null;
 }
 
-const CANVAS_WIDTH = 600;
-const CANVAS_HEIGHT = 800;
-const PAGE_BG = '#fff';
-const HIGHLIGHT_COLOR = 'rgba(250, 173, 20, 0.45)';
-const HIGHLIGHT_BORDER = 'rgba(250, 173, 20, 0.9)';
+type ViewerState = 'idle' | 'loading' | 'rendered' | 'unsupported' | 'error';
 
 const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [viewerState, setViewerState] = useState<ViewerState>('idle');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Clear and draw page background
-    ctx.fillStyle = PAGE_BG;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    // Draw page border shadow line
-    ctx.strokeStyle = '#e8e8e8';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    // Draw simulated text lines when no highlight active
-    if (!activeSource || activeSource.boxes.length === 0) {
-      ctx.fillStyle = '#f0f0f0';
-      for (let row = 0; row < 28; row++) {
-        const y = 48 + row * 26;
-        const w = row % 5 === 4 ? CANVAS_WIDTH * 0.55 : CANVAS_WIDTH * (0.75 + Math.random() * 0.18);
-        ctx.fillRect(48, y, w, 10);
-      }
+    if (!activeSource) {
+      setViewerState('idle');
       return;
     }
 
-    // Draw simulated text lines as background content
-    ctx.fillStyle = '#f0f0f0';
-    for (let row = 0; row < 28; row++) {
-      const y = 48 + row * 26;
-      const lineW = row % 5 === 4 ? CANVAS_WIDTH * 0.55 : CANVAS_WIDTH * 0.82;
-      ctx.fillRect(48, y, lineW, 10);
+    if (activeSource.sourceType === 'document') {
+      setViewerState('unsupported');
+      return;
     }
 
-    // Draw bounding box highlights
-    activeSource.boxes.forEach(([x1, y1, x2, y2]) => {
-      ctx.fillStyle = HIGHLIGHT_COLOR;
-      ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-      ctx.strokeStyle = HIGHLIGHT_BORDER;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-    });
+    const path = getRegulationPath(activeSource.docName);
+    if (!path) {
+      setViewerState('error');
+      setErrorMsg(`No registered path for "${activeSource.docName}"`);
+      return;
+    }
+
+    let cancelled = false;
+    setViewerState('loading');
+    setErrorMsg(null);
+
+    (async () => {
+      try {
+        const loadingTask = pdfjsLib.getDocument(path);
+        const pdf = await loadingTask.promise;
+        if (cancelled) return;
+
+        const page = await pdf.getPage(activeSource.pageIndex + 1);
+        if (cancelled) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const viewport = page.getViewport({ scale: 1 });
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+        if (cancelled) return;
+
+        // Bbox coordinates are in canvas pixel space at scale=1 (top-down, no flip needed).
+        activeSource.boxes.forEach(([x1, y1, x2, y2]) => {
+          ctx.fillStyle = HIGHLIGHT_COLOR;
+          ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+          ctx.strokeStyle = HIGHLIGHT_BORDER;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        });
+
+        setViewerState('rendered');
+      } catch (err) {
+        if (cancelled) return;
+        setViewerState('error');
+        setErrorMsg(err instanceof Error ? err.message : 'Failed to load PDF');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeSource]);
 
-  const isEmpty = !activeSource;
+  const isEmpty = viewerState === 'idle';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -91,6 +123,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
 
       {/* Canvas area */}
       <div
+        ref={containerRef}
         style={{
           flex: 1,
           overflowY: 'auto',
@@ -101,7 +134,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
           background: '#f5f5f5',
         }}
       >
-        {isEmpty ? (
+        {isEmpty && (
           <div style={{ textAlign: 'center', color: '#bfbfbf' }}>
             <FileTextOutlined style={{ fontSize: 48, marginBottom: 12 }} />
             <div>
@@ -110,18 +143,41 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
               </Text>
             </div>
           </div>
-        ) : (
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            style={{
-              boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
-              borderRadius: 4,
-              maxWidth: '100%',
-            }}
-          />
         )}
+
+        {viewerState === 'loading' && <Spin size="large" />}
+
+        {viewerState === 'unsupported' && (
+          <div style={{ textAlign: 'center', color: '#bfbfbf' }}>
+            <FileTextOutlined style={{ fontSize: 48, marginBottom: 12 }} />
+            <div>
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                Uploaded document preview is not yet supported
+              </Text>
+            </div>
+          </div>
+        )}
+
+        {viewerState === 'error' && (
+          <div style={{ textAlign: 'center', color: '#ff4d4f' }}>
+            <FileTextOutlined style={{ fontSize: 48, marginBottom: 12 }} />
+            <div>
+              <Text type="danger" style={{ fontSize: 13 }}>
+                {errorMsg ?? 'Failed to load document'}
+              </Text>
+            </div>
+          </div>
+        )}
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            display: viewerState === 'rendered' ? 'block' : 'none',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
+            borderRadius: 4,
+            maxWidth: '100%',
+          }}
+        />
       </div>
     </div>
   );

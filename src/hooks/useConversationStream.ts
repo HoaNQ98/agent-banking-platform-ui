@@ -9,7 +9,7 @@ import { useState, useCallback, useRef } from 'react';
 import { ConversationService } from '../api/services/conversations';
 import type { ConversationStreamEvent, UploadedFileInfo } from '../api/types';
 import { useAppStore } from '../store/useAppStore';
-import type { FileAttachment } from '../types';
+import type { ExtractedField, FileAttachment } from '../types';
 
 
 interface UseConversationStreamOptions {
@@ -30,7 +30,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
     uploadedFiles: [],
   });
 
-  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking, messages, prependRemoteConversation } = useAppStore();
+  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking, messages, prependRemoteConversation, setFormBuilderOpen, setReviewData } = useAppStore();
   const currentMessageIdRef = useRef<string | null>(null);
   const accumulatedTextRef = useRef<string>('');
   const isThinkingStartedRef = useRef<boolean>(false);
@@ -171,6 +171,40 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
           }
           break;
 
+        case 'pipeline_step_failed':
+          // Mark step failed in ThinkingPanel
+          if (currentMessageIdRef.current) {
+            const stepName = event.step || '';
+            const stepLabel = stepName.charAt(0).toUpperCase() + stepName.slice(1);
+            appendThinking(
+              conversationId,
+              currentMessageIdRef.current,
+              `✗ Step ${event.step_index}/${event.total_steps} — ${stepLabel} failed\n`
+            );
+          }
+          break;
+
+        case 'artifact':
+          // Pipeline produced an artifact — populate review data, add trigger bubble, auto-open
+          if (event.artifact && event.artifactType) {
+            const fields = (event.artifact.data as Record<string, unknown>)?.fields;
+            if (fields) {
+              setReviewData(fields as ExtractedField[]);
+            }
+            addMessage(conversationId, {
+              role: 'agent',
+              content: '',
+              type: 'form-trigger',
+              metadata: {
+                artifactId: event.artifact.id,
+                artifactType: event.artifactType,
+                messageId: event.artifact.messageId,
+              },
+            });
+            setFormBuilderOpen(true);
+          }
+          break;
+
         case 'tool_result':
           // Non-pipeline internal tool results — display in ThinkingPanel
           if (event.content && currentMessageIdRef.current) {
@@ -237,7 +271,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
           break;
       }
     },
-    [updateMessage, startThinking, appendThinking, completeThinking, state.uploadedFiles, options]
+    [addMessage, updateMessage, startThinking, appendThinking, completeThinking, setFormBuilderOpen, setReviewData, state.uploadedFiles, options]
   );
 
   /**
