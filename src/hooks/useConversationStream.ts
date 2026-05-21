@@ -185,17 +185,14 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
           break;
 
         case 'artifact':
-          // Pipeline produced an artifact — populate review data, add trigger bubble, auto-open
-          if (event.artifact && event.artifactType) {
+          // Artifact belongs to the current agent message — attach it inline, auto-open form builder
+          if (event.artifact && event.artifactType && currentMessageIdRef.current) {
             const fields = (event.artifact.data as Record<string, unknown>)?.fields;
             if (fields) {
               setReviewData(fields as ExtractedField[]);
             }
-            addMessage(conversationId, {
-              role: 'agent',
-              content: '',
-              type: 'form-trigger',
-              metadata: {
+            updateMessage(conversationId, currentMessageIdRef.current, {
+              artifact: {
                 artifactId: event.artifact.id,
                 artifactType: event.artifactType,
                 messageId: event.artifact.messageId,

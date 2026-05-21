@@ -1,7 +1,7 @@
 // Message Types
 export type MessageRole = 'user' | 'agent';
 
-export type MessageType = 'text' | 'loading' | 'form-trigger';
+export type MessageType = 'text' | 'loading';
 
 export interface FileAttachment {
   id: string;
@@ -22,6 +22,13 @@ export interface ThinkingProcess {
   endTime?: Date;
 }
 
+export interface MessageArtifact {
+  artifactId: string;
+  artifactType: string;
+  messageId?: string;
+  data?: Record<string, unknown> | null;
+}
+
 export interface Message {
   id: string;
   role: MessageRole;
@@ -29,7 +36,8 @@ export interface Message {
   type: MessageType;
   timestamp: Date;
   attachments?: FileAttachment[];
-  thinkingProcess?: ThinkingProcess; // Single thinking process panel
+  thinkingProcess?: ThinkingProcess;
+  artifact?: MessageArtifact;
   metadata?: {
     isStreaming?: boolean;
     messageId?: string;

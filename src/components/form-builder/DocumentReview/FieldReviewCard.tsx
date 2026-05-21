@@ -5,6 +5,7 @@ import {
   BulbOutlined,
   FileTextOutlined,
   ReadOutlined,
+  CheckCircleFilled,
 } from '@ant-design/icons';
 import type { ExtractedField, ActiveSource, FieldStatus } from '../../../types';
 
@@ -16,11 +17,11 @@ interface FieldReviewCardProps {
   onSourceClick: (source: ActiveSource) => void;
 }
 
-const STATUS_CONFIG: Record<FieldStatus, { label: string; color: string; bg: string }> = {
-  CRITICAL: { label: 'Must Fix',      color: '#ff4d4f', bg: '#fff2f0' },
-  WARNING:  { label: 'Should Fix',    color: '#faad14', bg: '#fffbe6' },
-  INFO:     { label: 'Best Practice', color: '#1890ff', bg: '#e6f7ff' },
-  OK:       { label: 'No Issue',      color: '#52c41a', bg: '#f6ffed' },
+const STATUS_CONFIG: Record<FieldStatus, { label: string; color: string; bg: string; pillBg: string }> = {
+  CRITICAL: { label: 'Must Fix',      color: '#ff4d4f', bg: '#fff2f0', pillBg: '#ff4d4f' },
+  WARNING:  { label: 'Should Fix',    color: '#faad14', bg: '#fffbe6', pillBg: '#faad14' },
+  INFO:     { label: 'Best Practice', color: '#1890ff', bg: '#e6f7ff', pillBg: '#1890ff' },
+  OK:       { label: 'No Issue',      color: '#52c41a', bg: '#f6ffed', pillBg: '#52c41a' },
 };
 
 function toLabel(camelCase: string): string {
@@ -38,13 +39,18 @@ function FieldValue({ value }: { value: unknown }) {
   if (Array.isArray(value)) {
     if (value.length === 0) return <Text type="secondary" style={{ fontSize: 13 }}>—</Text>;
     return (
-      <ul style={{ margin: '4px 0 0', paddingLeft: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 2 }}>
         {value.map((item, i) => (
-          <li key={i} style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', marginBottom: 2 }}>
-            {String(item)}
-          </li>
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <Text type="secondary" style={{ fontSize: 11, fontFamily: 'monospace', lineHeight: '20px', flexShrink: 0, userSelect: 'none' }}>
+              [{i + 1}]
+            </Text>
+            <Text style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', lineHeight: '20px', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+              {String(item)}
+            </Text>
+          </div>
         ))}
-      </ul>
+      </div>
     );
   }
 
@@ -52,159 +58,209 @@ function FieldValue({ value }: { value: unknown }) {
     const entries = Object.entries(value as Record<string, unknown>).filter(([, v]) => v !== null && v !== undefined);
     if (entries.length === 0) return <Text type="secondary" style={{ fontSize: 13 }}>—</Text>;
     return (
-      <table style={{ marginTop: 4, borderCollapse: 'collapse', width: '100%' }}>
-        <tbody>
-          {entries.map(([k, v]) => (
-            <tr key={k}>
-              <td style={{ paddingRight: 12, paddingBottom: 2, verticalAlign: 'top', whiteSpace: 'nowrap' }}>
-                <Text type="secondary" style={{ fontSize: 12 }}>{toLabel(k)}</Text>
-              </td>
-              <td style={{ paddingBottom: 2 }}>
-                <Text style={{ fontSize: 13, color: '#262626' }}>{String(v)}</Text>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 2 }}>
+        {entries.map(([k, v]) => (
+          <div key={k}>
+            <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 2 }}>{toLabel(k)}</Text>
+            <div style={{ fontSize: 13, color: '#262626', textAlign: 'justify', hyphens: 'auto', wordBreak: 'break-word' } as React.CSSProperties}>
+              {String(v)}
+            </div>
+          </div>
+        ))}
+      </div>
     );
   }
 
   return (
-    <Text style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+    <Text style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', whiteSpace: 'pre-wrap', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
       {String(value)}
     </Text>
   );
 }
 
-const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSourceClick }) => {
-  const config = STATUS_CONFIG[field.status];
+function SourceTags({ field, onSourceClick }: { field: ExtractedField; onSourceClick: (source: ActiveSource) => void }) {
   const refDocs = field.refDocuments ?? [];
   const refRegs = field.refRegulations ?? [];
-  const totalSources = refDocs.length + refRegs.length;
+  const total = refDocs.length + refRegs.length;
+  if (total === 0) return null;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+      {refDocs.map((doc, i) =>
+        (doc.bboxes ?? []).map((bbox, j) => (
+          <Tag
+            key={`doc-${i}-${j}`}
+            icon={<FileTextOutlined />}
+            color="default"
+            style={{ cursor: 'pointer', fontSize: 11 }}
+            onClick={() => onSourceClick({ docName: doc.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes, sourceType: 'document' })}
+          >
+            {doc.docName} p.{bbox.pageIndex + 1}
+          </Tag>
+        ))
+      )}
+      {refRegs.map((reg, i) =>
+        (reg.bboxes ?? []).map((bbox, j) => (
+          <Tag
+            key={`reg-${i}-${j}`}
+            icon={<ReadOutlined />}
+            color="processing"
+            style={{ cursor: 'pointer', fontSize: 11 }}
+            onClick={() => onSourceClick({ docName: reg.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes, sourceType: 'regulation' })}
+          >
+            {reg.regulationCode} {reg.sectionNumber}
+          </Tag>
+        ))
+      )}
+    </div>
+  );
+}
 
-  const hasDetails = !!field.issue || !!field.recommendation || totalSources > 0;
+const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSourceClick }) => {
+  const config = STATUS_CONFIG[field.status];
+  const isHighPriority = field.status === 'CRITICAL' || field.status === 'WARNING';
+  const isOk = field.status === 'OK';
 
-  const cardHeader = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+  // OK — flat collapsible row, value hidden until expanded
+  if (isOk) {
+    const okLabel = (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Text strong style={{ fontSize: 13 }}>{toLabel(field.fieldName)}</Text>
-        {totalSources > 0 && (
-          <Text type="secondary" style={{ fontSize: 11, marginLeft: 'auto', flexShrink: 0 }}>
-            {totalSources} source{totalSources > 1 ? 's' : ''}
-          </Text>
-        )}
+        <CheckCircleFilled style={{ color: config.color, fontSize: 13, flexShrink: 0 }} />
+        <Text style={{ fontSize: 13, color: '#595959' }}>{toLabel(field.fieldName)}</Text>
       </div>
-      <FieldValue value={field.fieldValue} />
+    );
+    return (
+      <div style={{ marginBottom: 4 }}>
+        <Collapse
+          size="small"
+          expandIcon={() => null}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            borderBottom: '1px solid #f0f0f0',
+            borderRadius: 0,
+            outline: isActive ? `1px solid ${config.color}` : undefined,
+          }}
+          items={[{ key: 'ok', label: okLabel, children: <FieldValue value={field.fieldValue} /> }]}
+        />
+      </div>
+    );
+  }
+
+  // CRITICAL / WARNING — expanded by default, full detail visible
+  if (isHighPriority) {
+    return (
+      <div
+        style={{
+          marginBottom: 12,
+          borderRadius: 8,
+          border: `1px solid ${config.color}40`,
+          background: config.bg,
+          overflow: 'hidden',
+          outline: isActive ? `2px solid ${config.color}` : undefined,
+        }}
+      >
+        {/* Status pill + field name */}
+        <div style={{ padding: '10px 14px 8px', borderBottom: `1px solid ${config.color}20` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <span
+              style={{
+                display: 'inline-block',
+                padding: '1px 8px',
+                borderRadius: 4,
+                background: config.pillBg,
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+              }}
+            >
+              {config.label.toUpperCase()}
+            </span>
+            <Text strong style={{ fontSize: 13, color: '#1a1a1a' }}>{toLabel(field.fieldName)}</Text>
+          </div>
+          <FieldValue value={field.fieldValue} />
+        </div>
+
+        {/* Issue + Suggestion always visible */}
+        <div style={{ padding: '10px 14px' }}>
+          {field.issue && (
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
+              <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+                {field.issue}
+              </Text>
+            </div>
+          )}
+          {field.recommendation && (
+            <div style={{ display: 'flex', gap: 6 }}>
+              <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
+              <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+                {field.recommendation}
+              </Text>
+            </div>
+          )}
+          <SourceTags field={field} onSourceClick={onSourceClick} />
+        </div>
+      </div>
+    );
+  }
+
+  // INFO — collapsed by default, expandable
+  const collapseLabel = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span
+        style={{
+          display: 'inline-block',
+          padding: '1px 8px',
+          borderRadius: 4,
+          background: '#e6f7ff',
+          color: config.color,
+          fontSize: 11,
+          fontWeight: 600,
+          border: `1px solid ${config.color}40`,
+        }}
+      >
+        {config.label.toUpperCase()}
+      </span>
+      <Text style={{ fontSize: 13, color: '#262626' }}>{toLabel(field.fieldName)}</Text>
     </div>
   );
 
-  const detailsContent = (
-    <div style={{ paddingTop: 4 }}>
+  const collapseContent = (
+    <div>
+      <FieldValue value={field.fieldValue} />
       {field.issue && (
-        <div
-          style={{
-            background: config.bg,
-            border: `1px solid ${config.color}20`,
-            borderRadius: 6,
-            padding: '10px 12px',
-            marginBottom: 10,
-          }}
-        >
-          <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
-            <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
-            <Text strong style={{ fontSize: 13, color: config.color }}>Issue</Text>
-          </div>
-          <Text style={{ fontSize: 13, color: '#595959' }}>{field.issue}</Text>
-        </div>
-      )}
-
-      {field.recommendation && (
-        <div
-          style={{
-            background: '#e6f7ff',
-            border: '1px solid #91d5ff',
-            borderRadius: 6,
-            padding: '10px 12px',
-            marginBottom: 10,
-          }}
-        >
-          <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
-            <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
-            <Text strong style={{ fontSize: 13, color: '#1890ff' }}>Suggestion</Text>
-          </div>
-          <Text style={{ fontSize: 13, color: '#595959' }}>{field.recommendation}</Text>
-        </div>
-      )}
-
-      {totalSources > 0 && (
-        <div>
-          <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>
-            Sources — click to view in document
+        <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+          <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
+          <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+            {field.issue}
           </Text>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {refDocs.map((doc, i) =>
-              (doc.bboxes ?? []).map((bbox, j) => (
-                <Tag
-                  key={`doc-${i}-${j}`}
-                  icon={<FileTextOutlined />}
-                  color="default"
-                  style={{ cursor: 'pointer', fontSize: 12 }}
-                  onClick={() =>
-                    onSourceClick({ docName: doc.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes, sourceType: 'document' })
-                  }
-                >
-                  {doc.docName} p.{bbox.pageIndex + 1}
-                </Tag>
-              ))
-            )}
-            {refRegs.map((reg, i) =>
-              (reg.bboxes ?? []).map((bbox, j) => (
-                <Tag
-                  key={`reg-${i}-${j}`}
-                  icon={<ReadOutlined />}
-                  color="processing"
-                  style={{ cursor: 'pointer', fontSize: 12 }}
-                  onClick={() =>
-                    onSourceClick({ docName: reg.docName, pageIndex: bbox.pageIndex, boxes: bbox.boxes, sourceType: 'regulation' })
-                  }
-                >
-                  {reg.regulationCode} {reg.sectionNumber}
-                </Tag>
-              ))
-            )}
-          </div>
         </div>
       )}
+      {field.recommendation && (
+        <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+          <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
+          <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+            {field.recommendation}
+          </Text>
+        </div>
+      )}
+      <SourceTags field={field} onSourceClick={onSourceClick} />
     </div>
   );
 
   return (
-    <div style={{ marginBottom: 12 }}>
-      {hasDetails ? (
-        <Collapse
-          size="small"
-          style={{
-            borderLeft: `3px solid ${config.color}`,
-            borderRadius: 8,
-            background: '#fff',
-            outline: isActive ? `1px solid ${config.color}` : undefined,
-          }}
-          items={[{ key: 'detail', label: cardHeader, children: detailsContent }]}
-        />
-      ) : (
-        <div
-          style={{
-            border: '1px solid #e8e8e8',
-            borderLeft: `3px solid ${config.color}`,
-            borderRadius: 8,
-            background: '#fff',
-            padding: '12px 16px',
-            outline: isActive ? `1px solid ${config.color}` : undefined,
-          }}
-        >
-          {cardHeader}
-        </div>
-      )}
+    <div style={{ marginBottom: 8 }}>
+      <Collapse
+        size="small"
+        style={{
+          borderLeft: `3px solid ${config.color}`,
+          borderRadius: 8,
+          background: '#fff',
+          outline: isActive ? `1px solid ${config.color}` : undefined,
+        }}
+        items={[{ key: 'detail', label: collapseLabel, children: collapseContent }]}
+      />
     </div>
   );
 };
