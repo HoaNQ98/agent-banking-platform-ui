@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Button } from 'antd';
+import { Typography } from 'antd';
 import { FileOutlined, FileSearchOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import type { Message, ExtractedField } from '../../types';
 import { formatRelativeTime, getFileIcon } from '../../utils';
@@ -21,8 +21,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   const renderMessage = (message: Message) => {
     const isUser = message.role === 'user';
     const isLoading = message.type === 'loading';
-    const isFormTrigger = message.type === 'form-trigger';
-    const showLoadingDots = !isUser && (isLoading || (!message.content && message.metadata?.isStreaming !== false));
+    const showLoadingDots = !isUser && (isLoading || (!message.content && !message.artifact && message.metadata?.isStreaming !== false));
 
     return (
       <div
@@ -208,15 +207,12 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                   </div>
                 )}
 
-                {/* Artifact Review Trigger */}
-                {isFormTrigger && message.metadata?.artifactId && (
+                {/* Artifact Review Trigger — inline within the same agent bubble */}
+                {!isUser && message.artifact && (
                   <div
                     onClick={() => {
-                      const artifactData = message.metadata?.artifact as Record<string, unknown> | undefined;
-                      const fields = artifactData?.fields as ExtractedField[] | undefined;
-                      if (fields) {
-                        setReviewData(fields);
-                      }
+                      const fields = message.artifact?.data?.fields;
+                      if (fields) setReviewData(fields as ExtractedField[]);
                       setFormBuilderOpen(true);
                     }}
                     style={{
@@ -263,7 +259,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: '12px', color: '#8c8c8c', lineHeight: '1.3' }}>Document</div>
                       <div style={{ fontSize: '13px', fontWeight: 600, color: '#262626', lineHeight: '1.4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {ArtifactTypeLabel[message.metadata.artifactType as ArtifactTypeValue] ?? 'Review Artifact'}
+                        {ArtifactTypeLabel[message.artifact.artifactType as ArtifactTypeValue] ?? 'Review Artifact'}
                       </div>
                     </div>
                     <ArrowRightOutlined style={{ color: '#667eea', fontSize: '13px', flexShrink: 0 }} />

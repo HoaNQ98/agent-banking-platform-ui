@@ -118,7 +118,7 @@ export const useAppStore = create<AppStore>()(
               id: item.id,
               role: item.role === 'user' ? 'user' : 'agent',
               content: item.content ?? '',
-              type: (readyArtifact?.artifactType === 'lc_form_advisory' ? 'form-trigger' : 'text') as Message['type'],
+              type: 'text' as Message['type'],
               timestamp: new Date(item.createdAt),
               attachments: item.attachments?.map((a) => ({
                 id: a.file_id,
@@ -127,7 +127,11 @@ export const useAppStore = create<AppStore>()(
                 size: 0,
                 url: a.file_path,
               })),
-              metadata: readyArtifact ? { artifact: readyArtifact.data, artifactId: readyArtifact.id, artifactType: readyArtifact.artifactType } : undefined,
+              artifact: readyArtifact ? {
+                artifactId: readyArtifact.id,
+                artifactType: readyArtifact.artifactType,
+                data: readyArtifact.data,
+              } : undefined,
             };
           });
           set((state) => ({

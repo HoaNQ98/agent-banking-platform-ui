@@ -72,6 +72,8 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
                 margin: '0.5em 0',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
+                textAlign: isUser ? 'left' : 'justify',
+                hyphens: isUser ? 'none' : 'auto',
               }}
               {...props}
             />
@@ -151,6 +153,8 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
             <li
               style={{
                 margin: '0.25em 0',
+                textAlign: isUser ? 'left' : 'justify',
+                hyphens: isUser ? 'none' : 'auto',
               }}
               {...props}
             />
