@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FileTextOutlined } from '@ant-design/icons';
 import { Typography, Spin } from 'antd';
 import * as pdfjsLib from 'pdfjs-dist';
-import type { ActiveSource } from '../../../types';
-import { getRegulationPath } from '../../../constants';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -15,54 +13,38 @@ const { Text } = Typography;
 const HIGHLIGHT_COLOR = 'rgba(250, 173, 20, 0.45)';
 const HIGHLIGHT_BORDER = 'rgba(250, 173, 20, 0.9)';
 
-interface PdfViewerProps {
-  activeSource: ActiveSource | null;
+export interface PdfViewerProps {
+  src: string;
+  pageIndex?: number;
+  highlights?: number[][];
+  label?: string;
 }
 
-type ViewerState = 'idle' | 'loading' | 'rendered' | 'unsupported' | 'error';
+type ViewerState = 'loading' | 'rendered' | 'error';
 
-const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
+const PdfViewer: React.FC<PdfViewerProps> = ({ src, pageIndex = 0, highlights, label }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [viewerState, setViewerState] = useState<ViewerState>('idle');
+  const [viewerState, setViewerState] = useState<ViewerState>('loading');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!activeSource) {
-      setViewerState('idle');
-      return;
-    }
-
-    if (activeSource.sourceType === 'document') {
-      setViewerState('unsupported');
-      return;
-    }
-
-    const path = getRegulationPath(activeSource.docName);
-    if (!path) {
-      setViewerState('error');
-      setErrorMsg(`No registered path for "${activeSource.docName}"`);
-      return;
-    }
-
     let cancelled = false;
     setViewerState('loading');
     setErrorMsg(null);
 
     (async () => {
       try {
-        const loadingTask = pdfjsLib.getDocument(path);
+        const loadingTask = pdfjsLib.getDocument(src);
         const pdf = await loadingTask.promise;
         if (cancelled) return;
 
-        const page = await pdf.getPage(activeSource.pageIndex + 1);
+        const page = await pdf.getPage(pageIndex + 1);
         if (cancelled) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const viewport = page.getViewport({ scale: 1 });
-
         canvas.width = viewport.width;
         canvas.height = viewport.height;
 
@@ -72,8 +54,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
         await page.render({ canvasContext: ctx, viewport, canvas }).promise;
         if (cancelled) return;
 
-        // Bbox coordinates are in canvas pixel space at scale=1 (top-down, no flip needed).
-        activeSource.boxes.forEach(([x1, y1, x2, y2]) => {
+        highlights?.forEach(([x1, y1, x2, y2]) => {
           ctx.fillStyle = HIGHLIGHT_COLOR;
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
           ctx.strokeStyle = HIGHLIGHT_BORDER;
@@ -92,13 +73,10 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
     return () => {
       cancelled = true;
     };
-  }, [activeSource]);
-
-  const isEmpty = viewerState === 'idle';
+  }, [src, pageIndex, highlights]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Viewer header */}
       <div
         style={{
           padding: '10px 16px',
@@ -112,51 +90,25 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ activeSource }) => {
       >
         <FileTextOutlined style={{ color: '#1890ff' }} />
         <Text style={{ fontSize: 13, flex: 1 }} ellipsis>
-          {activeSource ? activeSource.docName : 'No document selected'}
+          {label ?? src}
         </Text>
-        {activeSource && (
-          <Text type="secondary" style={{ fontSize: 12, flexShrink: 0 }}>
-            Page {activeSource.pageIndex + 1}
-          </Text>
-        )}
+        <Text type="secondary" style={{ fontSize: 12, flexShrink: 0 }}>
+          Page {pageIndex + 1}
+        </Text>
       </div>
 
-      {/* Canvas area */}
       <div
-        ref={containerRef}
         style={{
           flex: 1,
           overflowY: 'auto',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: isEmpty ? 'center' : 'flex-start',
+          alignItems: viewerState === 'loading' ? 'center' : 'flex-start',
           padding: '16px',
           background: '#f5f5f5',
         }}
       >
-        {isEmpty && (
-          <div style={{ textAlign: 'center', color: '#bfbfbf' }}>
-            <FileTextOutlined style={{ fontSize: 48, marginBottom: 12 }} />
-            <div>
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                Click a source tag on the left to view the document
-              </Text>
-            </div>
-          </div>
-        )}
-
         {viewerState === 'loading' && <Spin size="large" />}
-
-        {viewerState === 'unsupported' && (
-          <div style={{ textAlign: 'center', color: '#bfbfbf' }}>
-            <FileTextOutlined style={{ fontSize: 48, marginBottom: 12 }} />
-            <div>
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                Uploaded document preview is not yet supported
-              </Text>
-            </div>
-          </div>
-        )}
 
         {viewerState === 'error' && (
           <div style={{ textAlign: 'center', color: '#ff4d4f' }}>

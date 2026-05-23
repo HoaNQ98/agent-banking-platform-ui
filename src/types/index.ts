@@ -27,6 +27,7 @@ export interface MessageArtifact {
   artifactType: string;
   messageId?: string;
   data?: Record<string, unknown> | null;
+  processedFiles?: ProcessedFile[];
 }
 
 export interface Message {
@@ -107,6 +108,15 @@ export interface BoundingBox {
   boxes: number[][];
 }
 
+export interface ProcessedFile {
+  docId: string;
+  docName: string;
+  mimeType: string;
+  docPath: string;
+  docDownloadUrl?: string;
+  isMain: boolean;
+}
+
 export interface RefDocument {
   docName: string;
   refContent: string;
@@ -164,6 +174,7 @@ export interface AppState {
   activeConversationId: string | null;
   messages: Record<string, Message[]>; // Keyed by conversation ID
   reviewData: ExtractedField[] | null;
+  processedFiles: ProcessedFile[] | null;
   uiState: UIState;
   agentInfo: AgentInfo;
 }

@@ -16,7 +16,7 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
-  const { setFormBuilderOpen, setReviewData } = useAppStore();
+  const { setFormBuilderOpen, setReviewData, setProcessedFiles } = useAppStore();
 
   const renderMessage = (message: Message) => {
     const isUser = message.role === 'user';
@@ -213,6 +213,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                     onClick={() => {
                       const fields = message.artifact?.data?.fields;
                       if (fields) setReviewData(fields as ExtractedField[]);
+                      setProcessedFiles(message.artifact?.processedFiles ?? null);
                       setFormBuilderOpen(true);
                     }}
                     style={{
