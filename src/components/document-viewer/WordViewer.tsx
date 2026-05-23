@@ -170,7 +170,8 @@ const WordViewer: React.FC<WordViewerProps> = ({ src, label }) => {
           }}
         >
           {/* Rendered at natural doc size; CSS transform scales it down visually */}
-          <div ref={innerRef} />
+          {/* all:revert isolates docx-preview's injected styles from host-page CSS */}
+          <div ref={innerRef} style={{ all: 'revert' } as React.CSSProperties} />
         </div>
       </div>
     </div>
