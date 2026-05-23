@@ -1,29 +1,83 @@
-import React from 'react';
-import { Button, Typography } from 'antd';
-import { RobotOutlined, PlusOutlined, FileSearchOutlined } from '@ant-design/icons';
+import React, { useState, useRef } from 'react';
+import { Button, Input, Upload, Tag, message as antMessage } from 'antd';
+import type { UploadProps } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
+import { SendOutlined, PaperClipOutlined, CloseOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { CONVERSATION_STARTERS } from '../../constants';
-import sampleReviewData from '../../data/sampleReviewData';
+import { useConversationStream } from '../../hooks/useConversationStream';
+import { QUICK_SUGGESTIONS, FILE_UPLOAD } from '../../constants';
+import { formatFileSize, isValidFileSize, isValidFileType } from '../../utils';
 
-const { Title, Text } = Typography;
+const { TextArea } = Input;
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
 
 const EmptyChat: React.FC = () => {
   const navigate = useNavigate();
-  const { createConversation, setReviewData, setFormBuilderOpen } = useAppStore();
+  const { createConversation } = useAppStore();
+  const { sendMessage, isStreaming } = useConversationStream({
+    onError: (err) => antMessage.error(`Failed to send message: ${err.message}`),
+  });
 
-  const handleNewConversation = () => {
+  const [inputValue, setInputValue] = useState('');
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const inputRef = useRef<any>(null);
+
+  const handleSend = async (text?: string) => {
+    const messageToSend = (text ?? inputValue).trim();
+    if (!messageToSend && fileList.length === 0) return;
+    if (isStreaming) return;
+
     const id = createConversation();
     navigate(`/c/${id}`);
+
+    const files: File[] = fileList
+      .map((f) => f.originFileObj as File)
+      .filter(Boolean);
+
+    setInputValue('');
+    setFileList([]);
+
+    try {
+      await sendMessage(id, messageToSend || 'Sent files', files);
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
   };
 
-  const handleOpenReviewDemo = () => {
-    setReviewData(sampleReviewData);
-    setFormBuilderOpen(true);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
-  const handleStarterClick = (_starter: string) => {
-    handleNewConversation();
+  const removeFile = (file: UploadFile) => {
+    setFileList(fileList.filter((f) => f.uid !== file.uid));
+  };
+
+  const uploadProps: UploadProps = {
+    beforeUpload: (file) => {
+      if (!isValidFileType(file, [...FILE_UPLOAD.ALLOWED_TYPES])) {
+        antMessage.error(`${file.name} is not a valid file type`);
+        return Upload.LIST_IGNORE;
+      }
+      if (!isValidFileSize(file, FILE_UPLOAD.MAX_SIZE)) {
+        antMessage.error(`${file.name} is too large. Maximum size is ${formatFileSize(FILE_UPLOAD.MAX_SIZE)}`);
+        return Upload.LIST_IGNORE;
+      }
+      return false;
+    },
+    fileList,
+    onChange: ({ fileList: newFileList }) => setFileList(newFileList),
+    multiple: true,
+    showUploadList: false,
   };
 
   return (
@@ -31,114 +85,144 @@ const EmptyChat: React.FC = () => {
       style={{
         height: '100%',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f5f5f5',
+        background: '#fafafa',
+        padding: '0 24px',
       }}
     >
-      <div
-        style={{
-          textAlign: 'center',
-          maxWidth: '672px',
-          padding: '0 24px',
-        }}
-      >
-        {/* Robot Avatar */}
-        <div style={{ marginBottom: '24px' }}>
-          <div
+      <div style={{ width: '100%', maxWidth: '800px' }}>
+        {/* Greeting */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1
             style={{
-              width: '96px',
-              height: '96px',
-              margin: '0 auto',
-              background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+              fontSize: '32px',
+              fontWeight: 700,
+              margin: '0 0 10px',
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #1677ff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '-0.5px',
             }}
           >
-            <RobotOutlined style={{ fontSize: 48, color: 'white' }} />
-          </div>
+            {getGreeting()}
+          </h1>
+          <p style={{ fontSize: '15px', color: '#8c8c8c', margin: 0, fontWeight: 400 }}>
+            How can I help you today?
+          </p>
         </div>
 
-        {/* Welcome Message */}
-        <Title level={2} style={{ marginBottom: '16px' }}>
-          Hi! I'm your Banking Assistant
-        </Title>
-
-        <Text
-          type="secondary"
-          style={{
-            fontSize: '16px',
-            display: 'block',
-            marginBottom: '48px',
-          }}
-        >
-          How can I help you today?
-        </Text>
-
-        {/* Conversation Starters */}
-        <div style={{ width: '100%' }}>
-          <Text strong style={{ fontSize: '14px', display: 'block', marginBottom: '16px' }}>
-            Quick Actions:
-          </Text>
-
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '12px',
-              justifyContent: 'center',
-              marginBottom: '32px',
-            }}
-          >
-            {CONVERSATION_STARTERS.map((starter) => (
-              <Button
-                key={starter}
-                type="default"
-                size="large"
-                onClick={() => handleStarterClick(starter)}
-                style={{ borderRadius: '8px' }}
-              >
-                • {starter}
-              </Button>
-            ))}
-          </div>
-
-          {/* New Conversation Button */}
-          <div style={{ marginTop: '48px', display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <Button
-              type="primary"
-              size="large"
-              icon={<PlusOutlined />}
-              onClick={handleNewConversation}
-              style={{ borderRadius: '8px', height: '48px', padding: '0 32px' }}
-            >
-              Start New Conversation
-            </Button>
-            <Button
-              size="large"
-              icon={<FileSearchOutlined />}
-              onClick={handleOpenReviewDemo}
-              style={{ borderRadius: '8px', height: '48px', padding: '0 32px' }}
-            >
-              Demo: Review Extracted Data
-            </Button>
-          </div>
-        </div>
-
-        {/* Trust Indicators */}
+        {/* Quick starters */}
         <div
           style={{
-            marginTop: '48px',
-            paddingTop: '48px',
-            borderTop: '1px solid #f0f0f0',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '10px',
+            marginBottom: '32px',
           }}
         >
-          <Text type="secondary" style={{ fontSize: '13px' }}>
-            🔒 FDIC Insured | Secure | Encrypted
-          </Text>
+          {QUICK_SUGGESTIONS.map((s) => (
+            <button
+              key={s.label}
+              onClick={() => handleSend(s.label)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                border: '1.5px solid #e8e8e8',
+                background: '#fff',
+                color: '#595959',
+                fontSize: '13px',
+                fontWeight: 450,
+                cursor: 'pointer',
+                textAlign: 'left',
+                lineHeight: '1.5',
+                transition: 'all 0.15s ease',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLButtonElement;
+                el.style.borderColor = '#91caff';
+                el.style.color = '#1677ff';
+                el.style.background = '#f0f7ff';
+                el.style.boxShadow = '0 2px 8px rgba(22,119,255,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLButtonElement;
+                el.style.borderColor = '#e8e8e8';
+                el.style.color = '#595959';
+                el.style.background = '#fff';
+                el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+              }}
+            >
+              <span style={{ fontSize: '16px', lineHeight: 1 }}>{s.icon}</span>
+              {s.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Input */}
+        <div
+          style={{
+            background: '#fff',
+            borderRadius: '16px',
+            boxShadow: '0 2px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
+            padding: '12px 16px',
+          }}
+        >
+          {fileList.length > 0 && (
+            <div style={{ marginBottom: '10px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {fileList.map((file) => (
+                <Tag
+                  key={file.uid}
+                  closable
+                  onClose={() => removeFile(file)}
+                  closeIcon={<CloseOutlined />}
+                  style={{ borderRadius: '12px', padding: '4px 12px' }}
+                >
+                  📎 {file.name} ({formatFileSize(file.size || 0)})
+                </Tag>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
+            <Upload {...uploadProps}>
+              <Button
+                type="text"
+                icon={<PaperClipOutlined style={{ fontSize: '18px' }} />}
+                style={{ height: '40px', width: '40px', flexShrink: 0, color: '#8c8c8c' }}
+              />
+            </Upload>
+            <TextArea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type your message..."
+              autoSize={{ minRows: 1, maxRows: 6 }}
+              style={{
+                fontSize: '14px',
+                border: 'none',
+                boxShadow: 'none',
+                resize: 'none',
+                padding: '8px 4px',
+                background: 'transparent',
+              }}
+            />
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<SendOutlined />}
+              onClick={() => handleSend()}
+              disabled={!inputValue.trim() && fileList.length === 0}
+              loading={isStreaming}
+              style={{ width: '40px', height: '40px', flexShrink: 0 }}
+            />
+          </div>
         </div>
       </div>
     </div>

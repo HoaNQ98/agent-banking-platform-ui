@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Button, Typography, Empty } from 'antd';
-import { PlusOutlined, MessageOutlined } from '@ant-design/icons';
+import { PlusOutlined, MessageOutlined, LeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import ConversationList from './ConversationList';
@@ -19,6 +19,7 @@ const Sidebar: React.FC = () => {
     isLoadingConversations,
     conversationHasMore,
     fetchConversations,
+    toggleSidebar,
   } = useAppStore();
 
   const handleNewConversation = () => {
@@ -45,27 +46,58 @@ const Sidebar: React.FC = () => {
   const isEmpty = remoteConversations.length === 0 && !isLoadingConversations;
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#fff' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#fafafa' }}>
       {/* Header */}
       <div
         style={{
-          padding: '16px',
+          padding: '12px 16px',
           borderBottom: '1px solid #f0f0f0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          gap: '8px',
         }}
       >
-        <Title level={5} style={{ margin: 0 }}>
-          Conversations
-        </Title>
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<PlusOutlined />}
-          onClick={handleNewConversation}
-          aria-label="New conversation"
-        />
+        {/* App branding */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+          <div
+            style={{
+              width: '28px',
+              height: '28px',
+              background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: '11px' }}>BA</span>
+          </div>
+          <Title level={5} style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Banking Agent
+          </Title>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+          <Button
+            type="text"
+            shape="circle"
+            icon={<PlusOutlined />}
+            onClick={handleNewConversation}
+            aria-label="New conversation"
+            style={{ color: '#595959' }}
+          />
+          <Button
+            type="text"
+            shape="circle"
+            icon={<LeftOutlined />}
+            onClick={toggleSidebar}
+            aria-label="Collapse sidebar"
+            style={{ color: '#595959' }}
+          />
+        </div>
       </div>
 
       {/* Scrollable list */}

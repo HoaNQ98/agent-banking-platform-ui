@@ -134,11 +134,10 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
           size="small"
           expandIcon={() => null}
           style={{
-            background: 'transparent',
-            border: 'none',
-            borderBottom: '1px solid #f0f0f0',
-            borderRadius: 0,
-            outline: isActive ? `1px solid ${config.color}` : undefined,
+            background: '#fff',
+            border: '1px solid #f0f0f0',
+            borderRadius: 10,
+            outline: isActive ? `2px solid ${config.color}` : undefined,
           }}
           items={[{ key: 'ok', label: okLabel, children: <FieldValue value={field.fieldValue} /> }]}
         />
@@ -255,9 +254,10 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
         size="small"
         style={{
           borderLeft: `3px solid ${config.color}`,
-          borderRadius: 8,
+          borderRadius: 10,
           background: '#fff',
-          outline: isActive ? `1px solid ${config.color}` : undefined,
+          border: '1px solid #f0f0f0',
+          outline: isActive ? `2px solid ${config.color}` : undefined,
         }}
         items={[{ key: 'detail', label: collapseLabel, children: collapseContent }]}
       />

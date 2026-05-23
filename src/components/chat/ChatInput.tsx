@@ -88,16 +88,16 @@ const ChatInput: React.FC = () => {
     <div
       style={{
         background: '#fff',
-        borderTop: '1px solid #f0f0f0',
-        padding: '16px 24px',
+        borderRadius: '16px',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06)',
+        padding: '12px 16px',
       }}
-    >
-      <div style={{ maxWidth: '896px', margin: '0 auto' }}>
+      >
         {/* File Preview Area */}
         {fileList.length > 0 && (
           <div
             style={{
-              marginBottom: '12px',
+              marginBottom: '10px',
               display: 'flex',
               flexWrap: 'wrap',
               gap: '8px',
@@ -120,14 +120,14 @@ const ChatInput: React.FC = () => {
           </div>
         )}
 
-        {/* Input Area */}
+        {/* Input Row */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
           {/* File Upload Button */}
           <Upload {...uploadProps}>
             <Button
-              icon={<PaperClipOutlined />}
-              size="large"
-              style={{ height: '56px', flexShrink: 0 }}
+              type="text"
+              icon={<PaperClipOutlined style={{ fontSize: '18px' }} />}
+              style={{ height: '40px', width: '40px', flexShrink: 0, color: '#8c8c8c' }}
               disabled={!activeConversationId}
             />
           </Upload>
@@ -139,15 +139,14 @@ const ChatInput: React.FC = () => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
-            autoSize={{ minRows: 1, maxRows: 4 }}
+            autoSize={{ minRows: 1, maxRows: 6 }}
             style={{
               fontSize: '14px',
-              borderRadius: '24px',
-              border: '2px solid #f0f0f0',
+              border: 'none',
+              boxShadow: 'none',
               resize: 'none',
-              minHeight: '56px',
-              paddingTop: '16px',
-              paddingBottom: '16px',
+              padding: '8px 4px',
+              background: 'transparent',
             }}
             disabled={!activeConversationId}
           />
@@ -156,20 +155,18 @@ const ChatInput: React.FC = () => {
           <Button
             type="primary"
             shape="circle"
-            size="large"
             icon={<SendOutlined />}
             onClick={handleSend}
             disabled={!activeConversationId || (!inputValue.trim() && fileList.length === 0) || isStreaming}
             loading={isStreaming}
             style={{
-              width: '56px',
-              height: '56px',
+              width: '40px',
+              height: '40px',
               flexShrink: 0,
             }}
           />
         </div>
       </div>
-    </div>
   );
 };
 

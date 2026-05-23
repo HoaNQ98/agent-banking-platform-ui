@@ -29,6 +29,7 @@ const ConversationList: React.FC = () => {
 
   return (
     <List
+      style={{ padding: '8px' }}
       dataSource={remoteConversations}
       renderItem={(conversation) => {
         const isActive = conversation.id === activeConversationId;
@@ -37,15 +38,16 @@ const ConversationList: React.FC = () => {
           <List.Item
             onClick={() => navigate(`/c/${conversation.id}`)}
             style={{
-              padding: '12px 16px',
+              padding: '10px 12px',
               cursor: 'pointer',
-              borderLeft: isActive ? '3px solid #1890ff' : '3px solid transparent',
-              backgroundColor: isActive ? '#e6f7ff' : 'transparent',
-              transition: 'all 0.3s',
-              borderRadius: 0,
+              borderRadius: '10px',
+              backgroundColor: isActive ? '#e6f4ff' : 'transparent',
+              border: 'none',
+              marginBottom: '2px',
+              transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => {
-              if (!isActive) e.currentTarget.style.backgroundColor = '#f5f5f5';
+              if (!isActive) e.currentTarget.style.backgroundColor = '#f0f0f0';
             }}
             onMouseLeave={(e) => {
               if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
@@ -60,39 +62,24 @@ const ConversationList: React.FC = () => {
               }}
             >
               <div style={{ flex: 1, minWidth: 0, marginRight: '8px' }}>
-                {/* Active indicator + first message as title */}
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}
+                <Text
+                  strong={isActive}
+                  style={{
+                    color: isActive ? '#1677ff' : '#262626',
+                    fontSize: '13px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    lineHeight: '1.5',
+                  }}
                 >
-                  {isActive && (
-                    <div
-                      style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: '#1890ff',
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-                  <Text
-                    strong
-                    style={{
-                      color: isActive ? '#1890ff' : '#262626',
-                      fontSize: '14px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}
-                  >
-                    {conversation.firstMessage}
-                  </Text>
-                </div>
+                  {conversation.firstMessage}
+                </Text>
 
                 {/* Timestamp */}
-                <Text type="secondary" style={{ fontSize: '11px' }}>
+                <Text type="secondary" style={{ fontSize: '11px', marginTop: '2px', display: 'block' }}>
                   {formatRelativeTime(
                     new Date(conversation.updatedAt ?? conversation.createdAt)
                   )}
