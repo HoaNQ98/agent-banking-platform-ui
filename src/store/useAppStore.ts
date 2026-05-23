@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { AppState, Conversation, Message, ExtractedField, ProcessedFile, AgentStatus } from '../types';
 import { generateId } from '../utils';
-import { DEFAULT_MESSAGES } from '../constants';
 import { ConversationService } from '../api/services/conversations';
 import type { ConversationItem } from '../api/types';
 
@@ -123,11 +122,11 @@ export const useAppStore = create<AppStore>()(
               type: 'text' as Message['type'],
               timestamp: new Date(item.createdAt),
               attachments: item.attachments?.map((a) => ({
-                id: a.file_id,
-                name: a.file_name,
-                type: a.file_type ?? '',
+                id: a.fileId,
+                name: a.fileName,
+                type: a.fileType ?? '',
                 size: 0,
-                url: a.file_path,
+                url: a.downloadUrl ?? a.filePath,
               })),
               artifact: readyArtifact ? {
                 artifactId: readyArtifact.id,
@@ -187,15 +186,7 @@ export const useAppStore = create<AppStore>()(
             activeConversationId: newConversation.id,
             messages: {
               ...state.messages,
-              [newConversation.id]: [
-                {
-                  id: generateId(),
-                  role: 'agent',
-                  content: DEFAULT_MESSAGES.WELCOME,
-                  type: 'text',
-                  timestamp: new Date(),
-                },
-              ],
+              [newConversation.id]: [],
             },
           };
         });

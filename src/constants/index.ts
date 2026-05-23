@@ -4,8 +4,6 @@ export const LAYOUT = {
   FORM_BUILDER_WIDTH: 400,
   REVIEW_PANEL_WIDTH_PERCENT: 67,
   CHAT_COMPRESSED_WIDTH_PERCENT: 33,
-  HEADER_HEIGHT: 64,
-  INPUT_AREA_HEIGHT: 80,
   BREAKPOINTS: {
     MOBILE: 768,
     TABLET: 1280,
@@ -26,12 +24,12 @@ export const DEFAULT_MESSAGES = {
   LOADING: "Thinking...",
 } as const;
 
-// Sample Conversation Starters
-export const CONVERSATION_STARTERS = [
-  'Apply for a loan',
-  'Check account balance',
-  'Make a transfer',
-  'Report a lost card',
+// Quick suggestion chips shown on new conversation greeting screen
+export const QUICK_SUGGESTIONS = [
+  { icon: '📄', label: 'Review my Letter of Credit documents' },
+  { icon: '✅', label: 'Check Letter of Credit compliance' },
+  { icon: '📋', label: 'Explain Letter of Credit terms' },
+  { icon: '⚠️', label: 'Find discrepancies in my Letter of Credit' },
 ] as const;
 
 // File Upload Limits

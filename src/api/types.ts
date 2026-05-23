@@ -193,10 +193,11 @@ export interface ListConversationsResponse {
  * A single attachment reference stored on a message
  */
 export interface AttachmentInfo {
-  file_id: string;
-  file_name: string;
-  file_path: string;
-  file_type?: string;
+  fileId: string;
+  fileName: string;
+  filePath: string;
+  fileType?: string;
+  downloadUrl?: string;
 }
 
 /**
