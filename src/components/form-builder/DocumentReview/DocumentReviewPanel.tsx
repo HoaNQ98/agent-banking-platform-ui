@@ -3,19 +3,21 @@ import { Typography, Button, Tag } from 'antd';
 import { CloseOutlined, WarningOutlined } from '@ant-design/icons';
 import { useAppStore } from '../../../store/useAppStore';
 import type { ActiveSource } from '../../../types';
+import { getRegulationPath } from '../../../constants';
 import FieldReviewCard from './FieldReviewCard';
-import PdfViewer from './PdfViewer';
+import { DocumentViewer } from '../../document-viewer';
 
 const { Title, Text } = Typography;
 
 const DocumentReviewPanel: React.FC = () => {
-  const { reviewData, setReviewData, setFormBuilderOpen, setSidebarOpen } = useAppStore();
+  const { reviewData, processedFiles, setReviewData, setProcessedFiles, setFormBuilderOpen, setSidebarOpen } = useAppStore();
   const [activeSource, setActiveSource] = useState<ActiveSource | null>(null);
   const [activeFieldIndex, setActiveFieldIndex] = useState<number | null>(null);
 
   const handleClose = () => {
     setFormBuilderOpen(false);
     setReviewData(null);
+    setProcessedFiles(null);
     setSidebarOpen(true);
     setActiveSource(null);
     setActiveFieldIndex(null);
@@ -98,9 +100,57 @@ const DocumentReviewPanel: React.FC = () => {
           ))}
         </div>
 
-        {/* Right: PDF viewer */}
+        {/* Right: document viewer */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
-          <PdfViewer activeSource={activeSource} />
+          {activeSource?.sourceType === 'regulation' && (() => {
+            const path = getRegulationPath(activeSource.docName);
+            return path ? (
+              <DocumentViewer
+                src={path}
+                mimeType="application/pdf"
+                label={activeSource.docName}
+                pageIndex={activeSource.pageIndex}
+                highlights={activeSource.boxes}
+              />
+            ) : (
+              <div style={{ padding: 24, color: '#ff4d4f', fontSize: 13 }}>
+                No registered path for &quot;{activeSource.docName}&quot;
+              </div>
+            );
+          })()}
+          {activeSource?.sourceType === 'document' && (() => {
+            const file = processedFiles?.find((f) => f.docName === activeSource.docName)
+              ?? processedFiles?.find((f) => f.isMain);
+            return file ? (
+              <DocumentViewer
+                src={file.docDownloadUrl ?? file.docPath}
+                mimeType={file.mimeType}
+                label={file.docName}
+                pageIndex={activeSource.pageIndex}
+                highlights={activeSource.boxes}
+              />
+            ) : (
+              <div style={{ padding: 24, color: '#ff4d4f', fontSize: 13 }}>
+                Document not found: &quot;{activeSource.docName}&quot;
+              </div>
+            );
+          })()}
+          {!activeSource && (() => {
+            const mainFile = processedFiles?.find((f) => f.isMain) ?? processedFiles?.[0];
+            return mainFile ? (
+              <DocumentViewer
+                src={mainFile.docDownloadUrl ?? mainFile.docPath}
+                mimeType={mainFile.mimeType}
+                label={mainFile.docName}
+              />
+            ) : (
+              <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+                <div style={{ textAlign: 'center', color: '#bfbfbf' }}>
+                  <div style={{ fontSize: 13 }}>Click a source tag on the left to view the document</div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { AppState, Conversation, Message, ExtractedField, AgentStatus } from '../types';
+import type { AppState, Conversation, Message, ExtractedField, ProcessedFile, AgentStatus } from '../types';
 import { generateId } from '../utils';
 import { DEFAULT_MESSAGES } from '../constants';
 import { ConversationService } from '../api/services/conversations';
@@ -39,6 +39,7 @@ interface AppStore extends AppState, ConversationListState {
 
   // Review Actions
   setReviewData: (data: ExtractedField[] | null) => void;
+  setProcessedFiles: (data: ProcessedFile[] | null) => void;
 
   // UI Actions
   toggleSidebar: () => void;
@@ -58,6 +59,7 @@ const initialState: AppState & ConversationListState = {
   activeConversationId: null,
   messages: {},
   reviewData: null,
+  processedFiles: null,
   uiState: {
     isSidebarOpen: true,
     isFormBuilderOpen: false,
@@ -130,7 +132,8 @@ export const useAppStore = create<AppStore>()(
               artifact: readyArtifact ? {
                 artifactId: readyArtifact.id,
                 artifactType: readyArtifact.artifactType,
-                data: readyArtifact.data,
+                data: readyArtifact.data as Record<string, unknown>,
+                processedFiles: (readyArtifact.data as Record<string, unknown>)?.processedFiles as ProcessedFile[] | undefined,
               } : undefined,
             };
           });
@@ -372,6 +375,10 @@ export const useAppStore = create<AppStore>()(
 
       setReviewData: (data: ExtractedField[] | null) => {
         set({ reviewData: data });
+      },
+
+      setProcessedFiles: (data: ProcessedFile[] | null) => {
+        set({ processedFiles: data });
       },
 
       // UI Actions

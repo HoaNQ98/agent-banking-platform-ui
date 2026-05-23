@@ -9,7 +9,7 @@ import { useState, useCallback, useRef } from 'react';
 import { ConversationService } from '../api/services/conversations';
 import type { ConversationStreamEvent, UploadedFileInfo } from '../api/types';
 import { useAppStore } from '../store/useAppStore';
-import type { ExtractedField, FileAttachment } from '../types';
+import type { ExtractedField, ProcessedFile, FileAttachment } from '../types';
 
 
 interface UseConversationStreamOptions {
@@ -30,7 +30,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
     uploadedFiles: [],
   });
 
-  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking, messages, prependRemoteConversation, setFormBuilderOpen, setReviewData } = useAppStore();
+  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking, messages, prependRemoteConversation, setFormBuilderOpen, setReviewData, setProcessedFiles } = useAppStore();
   const currentMessageIdRef = useRef<string | null>(null);
   const accumulatedTextRef = useRef<string>('');
   const isThinkingStartedRef = useRef<boolean>(false);
@@ -187,15 +187,19 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
         case 'artifact':
           // Artifact belongs to the current agent message — attach it inline, auto-open form builder
           if (event.artifact && event.artifactType && currentMessageIdRef.current) {
-            const fields = (event.artifact.data as Record<string, unknown>)?.fields;
+            const artifactData = event.artifact.data as Record<string, unknown> | null;
+            const fields = artifactData?.fields;
+            const processedFiles = artifactData?.processedFiles as ProcessedFile[] | undefined;
             if (fields) {
               setReviewData(fields as ExtractedField[]);
             }
+            setProcessedFiles(processedFiles ?? null);
             updateMessage(conversationId, currentMessageIdRef.current, {
               artifact: {
                 artifactId: event.artifact.id,
                 artifactType: event.artifactType,
                 messageId: event.artifact.messageId,
+                processedFiles,
               },
             });
             setFormBuilderOpen(true);
@@ -268,7 +272,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
           break;
       }
     },
-    [addMessage, updateMessage, startThinking, appendThinking, completeThinking, setFormBuilderOpen, setReviewData, state.uploadedFiles, options]
+    [addMessage, updateMessage, startThinking, appendThinking, completeThinking, setFormBuilderOpen, setReviewData, setProcessedFiles, state.uploadedFiles, options]
   );
 
   /**
