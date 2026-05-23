@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Typography, Collapse } from 'antd';
+import { Tag, Typography, Collapse, Tooltip } from 'antd';
 import {
   WarningOutlined,
   BulbOutlined,
@@ -8,6 +8,7 @@ import {
   CheckCircleFilled,
 } from '@ant-design/icons';
 import type { ExtractedField, ActiveSource, FieldStatus } from '../../../types';
+import { FIELD_LABELS } from '../../../constants/fieldLabels';
 
 const { Text } = Typography;
 
@@ -25,10 +26,26 @@ const STATUS_CONFIG: Record<FieldStatus, { label: string; color: string; bg: str
 };
 
 function toLabel(camelCase: string): string {
+  if (FIELD_LABELS[camelCase]) return FIELD_LABELS[camelCase];
   return camelCase
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, (s) => s.toUpperCase())
     .trim();
+}
+
+const MAX_LABEL_CHARS = 40;
+
+function FieldLabel({ name, style }: { name: string; style?: React.CSSProperties }) {
+  const label = toLabel(name);
+  if (label.length <= MAX_LABEL_CHARS) {
+    return <span style={style}>{label}</span>;
+  }
+  const truncated = label.slice(0, MAX_LABEL_CHARS) + '…';
+  return (
+    <Tooltip title={label} placement="top">
+      <span style={{ ...style, cursor: 'default' }}>{truncated}</span>
+    </Tooltip>
+  );
 }
 
 function FieldValue({ value }: { value: unknown }) {
@@ -61,7 +78,7 @@ function FieldValue({ value }: { value: unknown }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 2 }}>
         {entries.map(([k, v]) => (
           <div key={k}>
-            <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 2 }}>{toLabel(k)}</Text>
+            <FieldLabel name={k} style={{ fontSize: 11, display: 'block', marginBottom: 2, color: '#8c8c8c' }} />
             <div style={{ fontSize: 13, color: '#262626', textAlign: 'justify', hyphens: 'auto', wordBreak: 'break-word' } as React.CSSProperties}>
               {String(v)}
             </div>
@@ -125,7 +142,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
     const okLabel = (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <CheckCircleFilled style={{ color: config.color, fontSize: 13, flexShrink: 0 }} />
-        <Text style={{ fontSize: 13, color: '#595959' }}>{toLabel(field.fieldName)}</Text>
+        <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#595959' }} />
       </div>
     );
     return (
@@ -175,7 +192,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
             >
               {config.label.toUpperCase()}
             </span>
-            <Text strong style={{ fontSize: 13, color: '#1a1a1a' }}>{toLabel(field.fieldName)}</Text>
+            <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#1a1a1a', fontWeight: 600 }} />
           </div>
           <FieldValue value={field.fieldValue} />
         </div>
@@ -221,7 +238,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
       >
         {config.label.toUpperCase()}
       </span>
-      <Text style={{ fontSize: 13, color: '#262626' }}>{toLabel(field.fieldName)}</Text>
+      <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#262626' }} />
     </div>
   );
 
