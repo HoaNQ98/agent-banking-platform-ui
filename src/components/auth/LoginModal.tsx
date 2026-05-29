@@ -49,7 +49,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
       footer={null}
       centered
       width={400}
-      maskClosable={!loading}
+      mask={{ closable: !loading }}
       // Disable the default Ant Design close button — we render our own
       closable={false}
       styles={{

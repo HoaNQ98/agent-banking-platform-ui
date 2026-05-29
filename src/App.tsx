@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import MainLayout from './components/layout/MainLayout';
+import EmailsPage from './components/emails/EmailsPage';
 
 // Ant Design theme configuration based on design specs
 const theme = {
@@ -40,6 +41,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<MainLayout />} />
         <Route path="/c/:conversationId" element={<MainLayout />} />
+        <Route path="/emails" element={<MainLayout contentOverride={<EmailsPage />} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ConfigProvider>
