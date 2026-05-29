@@ -6,7 +6,7 @@
  */
 
 import { getApiUrl } from '../config';
-import { client, APIException } from '../client';
+import { client, APIException, getAuthHeaders } from '../client';
 import type {
   ConversationInput,
   ConversationResponse,
@@ -164,6 +164,7 @@ export const ConversationService = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...getAuthHeaders(),
           },
           body: JSON.stringify(payload),
         });

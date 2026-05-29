@@ -7,6 +7,19 @@
 import { getConfig } from './config';
 import type { APIError } from './types';
 
+export function getAuthHeaders(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem('auth');
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    const token = parsed?.state?.user?.accessToken;
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
+  } catch {
+    return {};
+  }
+}
+
 /**
  * Custom error class for API errors
  */
@@ -42,6 +55,7 @@ async function request<T>(
   // Set default headers
   const headers = {
     'Content-Type': 'application/json',
+    ...getAuthHeaders(),
     ...fetchOptions.headers,
   };
 
