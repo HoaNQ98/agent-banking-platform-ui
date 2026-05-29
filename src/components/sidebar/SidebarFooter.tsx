@@ -1,12 +1,47 @@
-import React from 'react';
-import { Divider, Button, Avatar, Typography, Dropdown } from 'antd';
+import React, { useState } from 'react';
+import { Divider, Button, Avatar, Typography, Dropdown, notification } from 'antd';
 import type { MenuProps } from 'antd';
-import { UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/useAuthStore';
+import { useAppStore } from '../../store/useAppStore';
+import { AuthService } from '../../api/services/auth';
+import LoginModal from '../auth/LoginModal';
 
 const { Text } = Typography;
 
 const SidebarFooter: React.FC = () => {
-  const menuItems: MenuProps['items'] = [
+  const [loginOpen, setLoginOpen] = useState(false);
+  const navigate = useNavigate();
+  const [notifApi, notifContextHolder] = notification.useNotification();
+  const { user, isLoggedIn, logout } = useAuthStore();
+  const { reset: resetAppStore, fetchConversations } = useAppStore();
+
+  const handleLogout = async () => {
+    try {
+      const res = await AuthService.logout();
+      notifApi.success({
+        message: 'Signed out',
+        description: res.message || 'You have been signed out successfully.',
+        placement: 'topRight',
+        duration: 3,
+      });
+    } catch (err: any) {
+      notifApi.error({
+        message: 'Logout failed',
+        description: err.detail || err.message || 'Could not sign out from the server.',
+        placement: 'topRight',
+        duration: 4,
+      });
+    } finally {
+      logout();           // clear auth store + localStorage
+      resetAppStore();    // clear conversations, messages, active id
+      navigate('/', { replace: true });
+      fetchConversations(1); // reload as guest (no token in localStorage anymore)
+    }
+  };
+
+  const loggedInMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
       icon: <UserOutlined />,
@@ -19,20 +54,32 @@ const SidebarFooter: React.FC = () => {
       label: 'Settings',
       onClick: () => console.log('Settings clicked'),
     },
-    {
-      type: 'divider',
-    },
+    { type: 'divider' },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: 'Logout',
       danger: true,
-      onClick: () => console.log('Logout clicked'),
+      onClick: handleLogout,
     },
   ];
 
+  const guestMenuItems: MenuProps['items'] = [
+    {
+      key: 'login',
+      icon: <LoginOutlined />,
+      label: 'Login',
+      onClick: () => setLoginOpen(true),
+    },
+  ];
+
+  const displayName = isLoggedIn && user ? user.firstName : 'User Profile';
+  const displaySub = isLoggedIn && user ? user.role : 'View settings';
+  const menuItems = isLoggedIn ? loggedInMenuItems : guestMenuItems;
+
   return (
     <>
+      {notifContextHolder}
       <Divider style={{ margin: 0 }} />
       <div style={{ padding: '12px' }}>
         <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="topRight">
@@ -56,23 +103,51 @@ const SidebarFooter: React.FC = () => {
           >
             <Avatar
               size={40}
-              icon={<UserOutlined />}
               style={{
-                background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                background: isLoggedIn
+                  ? 'linear-gradient(135deg, #0047AB 0%, #13c2c2 100%)'
+                  : 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                fontSize: '22px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
-            />
-            <div style={{ marginLeft: '12px', textAlign: 'left', flex: 1 }}>
-              <Text strong style={{ fontSize: '14px', display: 'block' }}>
-                User Profile
+            >
+              {isLoggedIn ? '🐶' : <UserOutlined />}
+            </Avatar>
+            <div style={{ marginLeft: '12px', textAlign: 'left', flex: 1, minWidth: 0 }}>
+              <Text
+                strong
+                style={{
+                  fontSize: '14px',
+                  display: 'block',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {displayName}
               </Text>
-              <Text type="secondary" style={{ fontSize: '12px' }}>
-                View settings
+              <Text
+                type="secondary"
+                style={{
+                  fontSize: '12px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'block',
+                }}
+              >
+                {displaySub}
               </Text>
             </div>
-            <SettingOutlined style={{ color: '#bfbfbf' }} />
+            <SettingOutlined style={{ color: '#bfbfbf', flexShrink: 0 }} />
           </Button>
         </Dropdown>
       </div>
+
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 };
