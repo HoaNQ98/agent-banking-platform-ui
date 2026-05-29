@@ -1,18 +1,26 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Button, Typography, Empty } from 'antd';
-import { PlusOutlined, MessageOutlined, LeftOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Button, Typography } from 'antd';
+import {
+  PlusOutlined,
+  MessageOutlined,
+  LeftOutlined,
+  MailOutlined,
+} from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { PRIVILEGED_ROLES } from '../../constants';
 import ConversationList from './ConversationList';
 import ConversationSkeleton from './ConversationSkeleton';
 import SidebarFooter from './SidebarFooter';
 
 const { Title, Text } = Typography;
 
-const SCROLL_THRESHOLD = 80; // px from bottom to trigger next page load
+const SCROLL_THRESHOLD = 80;
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     createConversation,
     remoteConversations,
@@ -21,6 +29,12 @@ const Sidebar: React.FC = () => {
     fetchConversations,
     toggleSidebar,
   } = useAppStore();
+  const { isLoggedIn, user } = useAuthStore();
+
+  const canSeeEmails = isLoggedIn && user != null && PRIVILEGED_ROLES.includes(user.role);
+
+  const isChatActive = location.pathname === '/' || location.pathname.startsWith('/c/');
+  const isEmailsActive = location.pathname === '/emails';
 
   const handleNewConversation = () => {
     const id = createConversation();
@@ -29,7 +43,6 @@ const Sidebar: React.FC = () => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Initial load
   useEffect(() => {
     fetchConversations(1);
   }, []);
@@ -58,7 +71,6 @@ const Sidebar: React.FC = () => {
           gap: '8px',
         }}
       >
-        {/* App branding */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
           <div
             style={{
@@ -74,12 +86,14 @@ const Sidebar: React.FC = () => {
           >
             <span style={{ color: '#fff', fontWeight: 700, fontSize: '11px' }}>BA</span>
           </div>
-          <Title level={5} style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Title
+            level={5}
+            style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             Banking Agent
           </Title>
         </div>
 
-        {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
           <Button
             type="text"
@@ -100,57 +114,104 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Scrollable list */}
+      {/* Scrollable body */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        style={{ flex: 1, overflowY: 'auto' }}
+        style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
       >
-        {/* Initial full-page skeleton while first page loads */}
-        {remoteConversations.length === 0 && isLoadingConversations ? (
-          <ConversationSkeleton count={8} />
-        ) : isEmpty ? (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              padding: '24px',
-            }}
+        {/* Features section */}
+        <div style={{ padding: '16px 8px 8px' }}>
+          <Text
+            type="secondary"
+            style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', padding: '0 8px', display: 'block', marginBottom: '4px' }}
           >
-            <Empty
-              image={<MessageOutlined style={{ fontSize: 48, color: '#9CA3AF' }} />}
-              description={
-                <div style={{ textAlign: 'center' }}>
-                  <div>
-                    <Text strong>No conversations yet</Text>
-                  </div>
-                  <div style={{ marginTop: '8px' }}>
-                    <Text type="secondary" style={{ fontSize: '14px' }}>
-                      Start a new conversation to get assistance
-                    </Text>
-                  </div>
-                </div>
-              }
-            >
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleNewConversation}>
-                New Conversation
-              </Button>
-            </Empty>
-          </div>
-        ) : (
-          <>
-            <ConversationList />
-            {/* Bottom skeleton while loading next page */}
-            {isLoadingConversations && <ConversationSkeleton count={3} />}
-          </>
-        )}
+            Features
+          </Text>
+
+          <FeatureItem
+            icon={<MessageOutlined />}
+            label="Chat"
+            active={isChatActive}
+            onClick={() => navigate('/')}
+          />
+
+          {canSeeEmails && (
+            <FeatureItem
+              icon={<MailOutlined />}
+              label="Emails"
+              active={isEmailsActive}
+              onClick={() => navigate('/emails')}
+            />
+          )}
+        </div>
+
+        {/* Recents section */}
+        <div style={{ flex: 1, paddingTop: '8px' }}>
+          <Text
+            type="secondary"
+            style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', padding: '0 16px', display: 'block', marginBottom: '4px' }}
+          >
+            Recents
+          </Text>
+
+          {remoteConversations.length === 0 && isLoadingConversations ? (
+            <ConversationSkeleton count={8} />
+          ) : isEmpty ? (
+            null
+          ) : (
+            <>
+              <ConversationList />
+              {isLoadingConversations && <ConversationSkeleton count={3} />}
+            </>
+          )}
+        </div>
       </div>
 
       <SidebarFooter />
     </div>
   );
 };
+
+interface FeatureItemProps {
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}
+
+const FeatureItem: React.FC<FeatureItemProps> = ({ icon, label, active, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      padding: '8px 12px',
+      borderRadius: '10px',
+      border: 'none',
+      cursor: 'pointer',
+      background: active ? '#e6f4ff' : 'transparent',
+      color: active ? '#1677ff' : '#262626',
+      fontWeight: active ? 600 : 400,
+      fontSize: '14px',
+      transition: 'background-color 0.15s ease',
+      textAlign: 'left',
+      marginBottom: '2px',
+    }}
+    onMouseEnter={(e) => {
+      if (!active) e.currentTarget.style.backgroundColor = '#f0f0f0';
+    }}
+    onMouseLeave={(e) => {
+      if (!active) e.currentTarget.style.backgroundColor = 'transparent';
+    }}
+  >
+    <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', color: active ? '#1677ff' : '#595959' }}>
+      {icon}
+    </span>
+    {label}
+  </button>
+);
 
 export default Sidebar;

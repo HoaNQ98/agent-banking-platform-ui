@@ -1,3 +1,21 @@
+// User Account Roles
+export const USER_ROLES = {
+  USER: 'user',
+  ADMIN: 'admin',
+  SUPERADMIN: 'superadmin',
+} as const;
+
+export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+
+export const PRIVILEGED_ROLES: string[] = [USER_ROLES.ADMIN, USER_ROLES.SUPERADMIN];
+
+// Message Roles (chat messages)
+export const MESSAGE_ROLES = {
+  USER: 'user',
+  AGENT: 'agent',
+  ASSISTANT: 'assistant',
+} as const;
+
 // Layout Constants
 export const LAYOUT = {
   SIDEBAR_WIDTH: 280,

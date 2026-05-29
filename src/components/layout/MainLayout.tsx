@@ -11,7 +11,11 @@ import DocumentReviewPanel from '../form-builder/DocumentReview/DocumentReviewPa
 
 const { Sider, Content } = Layout;
 
-const MainLayout: React.FC = () => {
+interface MainLayoutProps {
+  contentOverride?: React.ReactNode;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
   useConversationRoute();
   const { uiState, reviewData, setMobile, setSidebarOpen, toggleSidebar } = useAppStore();
   const { isSidebarOpen, isFormBuilderOpen, isMobile } = uiState;
@@ -126,7 +130,7 @@ const MainLayout: React.FC = () => {
           </Button>
         )}
 
-        {/* Chat — shrinks to 1/3 when review is open */}
+        {/* Main content area */}
         <Content
           style={{
             overflow: 'hidden',
@@ -136,7 +140,7 @@ const MainLayout: React.FC = () => {
             minWidth: 0,
           }}
         >
-          <ChatSection />
+          {contentOverride ?? <ChatSection />}
         </Content>
 
         {/* Review panel — slides in from right, takes 2/3 */}

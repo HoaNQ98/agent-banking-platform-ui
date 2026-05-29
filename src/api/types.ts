@@ -278,3 +278,84 @@ export interface ArtifactGenerateResponse {
   status: string;
   data: ArtifactItem;
 }
+
+// ─── Email Ticket Types ───────────────────────────────────────────────────────
+
+export type EmailStatus = 'NEW' | 'IN_PROGRESS' | 'AWAITING_SEND' | 'RESOLVED' | 'CLOSED' | 'ARCHIVED';
+export type EmailCategory =
+  | 'LC_OPEN_REQUEST' | 'LC_AMENDMENT' | 'LC_PAYMENT'
+  | 'BANK_TRANSFER' | 'ACCOUNT_INQUIRY' | 'LOAN_REQUEST'
+  | 'TECHNICAL_SUPPORT' | 'CUSTOMER_SUPPORT' | 'BILLING_PAYMENT'
+  | 'EDUCATION' | 'WORK_PROFESSIONAL' | 'PERSONAL'
+  | 'COMMUNITY_NEWSLETTER' | 'COMMUNITY_FORUM' | 'MARKETING_PROMOTIONAL'
+  | 'DOCUMENTATION_REQUEST' | 'COMPLIANCE_REGULATORY' | 'NOTIFICATION_ALERT'
+  | 'SPAM_JUNK' | 'UNCATEGORIZED';
+export type EmailPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type DraftStatus = string | null;
+
+export interface EmailTicket {
+  id: string;
+  emailId: string;
+  threadId: string;
+  senderEmail: string;
+  senderName: string;
+  subject: string;
+  category: EmailCategory;
+  priority: EmailPriority;
+  status: EmailStatus;
+  draftStatus: DraftStatus;
+  tags: string[] | null;
+  isCommunityEmail: boolean;
+  receivedAt: string;
+  createdAt: string;
+  updatedAt: string | null;
+  // Detail-only fields (present in GET /tickets/:id)
+  bodyText?: string;
+  bodyHtml?: string;
+  gmailLabelIds?: string[];
+  attachments?: EmailAttachment[];
+  draft?: EmailDraft | null;
+  processedAt?: string | null;
+  resolvedAt?: string | null;
+}
+
+export interface EmailAttachment {
+  id: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+}
+
+export interface EmailDraft {
+  id: string;
+  subject: string;
+  body: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface ListTicketsParams {
+  page?: number;
+  size?: number;
+  status?: EmailStatus | null;
+  category?: EmailCategory | null;
+  priority?: EmailPriority | null;
+}
+
+export interface ListTicketsResponse {
+  status: string;
+  data: EmailTicket[];
+  message: string;
+  errors: null | string;
+  meta: {
+    pagination: {
+      total: number;
+      page: number;
+      perPage: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+  };
+}
