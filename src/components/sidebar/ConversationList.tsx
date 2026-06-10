@@ -64,15 +64,14 @@ const ConversationList: React.FC = () => {
               <div style={{ flex: 1, minWidth: 0, marginRight: '8px' }}>
                 <Text
                   strong={isActive}
+                  title={conversation.firstMessage}
                   style={{
                     color: isActive ? '#1677ff' : '#262626',
                     fontSize: '13px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    lineHeight: '1.5',
+                    whiteSpace: 'nowrap',
+                    display: 'block',
                   }}
                 >
                   {conversation.firstMessage}
