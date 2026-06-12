@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Spin, Typography, Divider, Collapse, Tag, Button, Select } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, Spin, Typography, Divider, Collapse, Tag, Button, Select, Input } from 'antd';
 import {
   MailOutlined,
   CalendarOutlined,
@@ -8,6 +8,7 @@ import {
   RobotOutlined,
   SendOutlined,
   EditOutlined,
+  SaveOutlined,
 } from '@ant-design/icons';
 import { TicketService } from '../../api/services/tickets';
 import type { EmailTicket, EmailStatus } from '../../api/types';
@@ -74,12 +75,100 @@ function gmailLabelText(label: string): string {
 
 // ─── AI Draft card ────────────────────────────────────────────────────────────
 
-const DraftCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
+const DraftCard: React.FC<{
+  ticket: EmailTicket;
+  onSave: (updates: { subject: string; body: string }) => void;
+}> = ({ ticket, onSave }) => {
   const hasDraft = !!ticket.draft;
   const draftStatus = ticket.draftStatus ?? ticket.draft?.status;
   // The backend may return HTML in bodyText with bodyHtml null
   const draftContent = ticket.draft?.bodyHtml || ticket.draft?.bodyText || '';
   const draftIsHtml = /^\s*</.test(draftContent);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [subject, setSubject] = useState('');
+  const [textBody, setTextBody] = useState('');
+  // Bumped on cancel to remount the iframe and discard in-place edits
+  const [frameKey, setFrameKey] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // The email template wraps the message in a `.body` div; only that region
+  // becomes editable — header/footer stay locked.
+  const editableRegion = (): HTMLElement | null => {
+    const doc = iframeRef.current?.contentDocument;
+    return doc ? ((doc.querySelector('.body') as HTMLElement | null) ?? doc.body) : null;
+  };
+
+  const resizeFrame = () => {
+    const iframe = iframeRef.current;
+    const height = iframe?.contentDocument?.body?.scrollHeight;
+    if (iframe && height) iframe.style.height = `${height}px`;
+  };
+
+  useEffect(() => {
+    if (!draftIsHtml) return;
+    const doc = iframeRef.current?.contentDocument;
+    const region = editableRegion();
+    if (!doc || !region) return;
+
+    if (!isEditing) {
+      region.removeAttribute('contenteditable');
+      region.style.outline = '';
+      region.style.outlineOffset = '';
+      return;
+    }
+
+    region.setAttribute('contenteditable', 'true');
+    region.style.outline = '2px dashed #b37feb';
+    region.style.outlineOffset = '-2px';
+    region.focus();
+
+    // Force plain-text paste so Word/web formatting can't corrupt the template
+    const onPaste = (e: Event) => {
+      const evt = e as ClipboardEvent;
+      evt.preventDefault();
+      const text = evt.clipboardData?.getData('text/plain') ?? '';
+      const selection = doc.getSelection();
+      if (!selection?.rangeCount) return;
+      selection.deleteFromDocument();
+      selection.getRangeAt(0).insertNode(doc.createTextNode(text));
+      selection.collapseToEnd();
+    };
+    doc.addEventListener('paste', onPaste);
+    region.addEventListener('input', resizeFrame);
+    return () => {
+      doc.removeEventListener('paste', onPaste);
+      region.removeEventListener('input', resizeFrame);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing, frameKey, draftIsHtml]);
+
+  const startEditing = () => {
+    setSubject(ticket.draft?.subject ?? '');
+    if (!draftIsHtml) setTextBody(draftContent);
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    // Remount the iframe to restore the original content
+    if (draftIsHtml) setFrameKey((k) => k + 1);
+  };
+
+  const handleSave = () => {
+    let body = textBody;
+    if (draftIsHtml) {
+      const doc = iframeRef.current?.contentDocument;
+      const region = editableRegion();
+      if (!doc || !region) return;
+      region.removeAttribute('contenteditable');
+      region.style.outline = '';
+      region.style.outlineOffset = '';
+      body = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+    }
+    onSave({ subject: subject.trim(), body });
+    setIsEditing(false);
+  };
 
   return (
     <div
@@ -99,43 +188,62 @@ const DraftCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
             AI Draft Reply
           </Text>
         </div>
-        {draftStatus && (
-          <span style={{ fontSize: '11px', color: '#722ed1', background: '#efdbff', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
-            {draftStatus}
+        {isEditing ? (
+          <span style={{ fontSize: '11px', color: '#531dab', background: '#efdbff', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+            EDITING
           </span>
+        ) : (
+          draftStatus && (
+            <span style={{ fontSize: '11px', color: '#722ed1', background: '#efdbff', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+              {draftStatus}
+            </span>
+          )
         )}
       </div>
 
       {hasDraft ? (
         <>
           {/* Draft subject */}
-          <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginBottom: '6px' }}>
-            Re: {ticket.draft!.subject}
-          </Text>
-          {/* Draft body preview */}
+          {isEditing ? (
+            <Input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              size="small"
+              prefix={<Text type="secondary" style={{ fontSize: '11px' }}>Re:</Text>}
+              style={{ marginBottom: '8px', fontSize: '12px' }}
+            />
+          ) : (
+            <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginBottom: '6px' }}>
+              Re: {ticket.draft!.subject}
+            </Text>
+          )}
+          {/* Draft body — rendered email; the message region is editable in place */}
           {draftIsHtml ? (
             <div
               style={{
                 background: '#fff',
-                border: '1px solid #efdbff',
+                border: isEditing ? '1px solid #b37feb' : '1px solid #efdbff',
                 borderRadius: '8px',
-                maxHeight: '320px',
-                overflowY: 'auto',
-                marginBottom: '14px',
+                marginBottom: isEditing ? '6px' : '14px',
               }}
             >
               <iframe
+                key={frameKey}
+                ref={iframeRef}
                 srcDoc={draftContent}
                 sandbox="allow-same-origin"
-                style={{ width: '100%', minHeight: '200px', border: 'none', display: 'block' }}
+                style={{ width: '100%', minHeight: '200px', border: 'none', display: 'block', borderRadius: '8px' }}
                 title="Draft reply body"
-                onLoad={(e) => {
-                  const iframe = e.currentTarget;
-                  const height = iframe.contentDocument?.body?.scrollHeight;
-                  if (height) iframe.style.height = `${height}px`;
-                }}
+                onLoad={resizeFrame}
               />
             </div>
+          ) : isEditing ? (
+            <Input.TextArea
+              value={textBody}
+              onChange={(e) => setTextBody(e.target.value)}
+              autoSize={{ minRows: 10, maxRows: 18 }}
+              style={{ fontSize: '13px', lineHeight: 1.6, marginBottom: '14px' }}
+            />
           ) : (
             <div
               style={{
@@ -155,24 +263,53 @@ const DraftCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
               {draftContent || '—'}
             </div>
           )}
+          {isEditing && draftIsHtml && (
+            <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginBottom: '12px' }}>
+              Click into the message and type to edit. The header and footer are locked.
+            </Text>
+          )}
           {/* Actions */}
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-            <Button size="small" icon={<EditOutlined />} style={{ borderRadius: '7px' }}>
-              Edit Draft
-            </Button>
-            <Button
-              type="primary"
-              size="small"
-              icon={<SendOutlined />}
-              style={{
-                borderRadius: '7px',
-                background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 100%)',
-                border: 'none',
-                boxShadow: '0 2px 6px rgba(0,71,171,0.25)',
-              }}
-            >
-              Send
-            </Button>
+            {isEditing ? (
+              <>
+                <Button size="small" style={{ borderRadius: '7px' }} onClick={cancelEditing}>
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<SaveOutlined />}
+                  onClick={handleSave}
+                  style={{
+                    borderRadius: '7px',
+                    background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 100%)',
+                    border: 'none',
+                    boxShadow: '0 2px 6px rgba(0,71,171,0.25)',
+                  }}
+                >
+                  Save Draft
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="small" icon={<EditOutlined />} style={{ borderRadius: '7px' }} onClick={startEditing}>
+                  Edit Draft
+                </Button>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<SendOutlined />}
+                  style={{
+                    borderRadius: '7px',
+                    background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 100%)',
+                    border: 'none',
+                    boxShadow: '0 2px 6px rgba(0,71,171,0.25)',
+                  }}
+                >
+                  Send
+                </Button>
+              </>
+            )}
           </div>
         </>
       ) : (
@@ -380,6 +517,22 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
   const [ticket, setTicket] = useState<EmailTicket | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Local-only until the backend exposes a draft update endpoint
+  const handleDraftSave = (updates: { subject: string; body: string }) => {
+    setTicket((prev) => {
+      if (!prev?.draft) return prev;
+      const usesHtmlField = !!prev.draft.bodyHtml;
+      return {
+        ...prev,
+        draft: {
+          ...prev.draft,
+          subject: updates.subject,
+          bodyHtml: usesHtmlField ? updates.body : prev.draft.bodyHtml,
+          bodyText: usesHtmlField ? prev.draft.bodyText : updates.body,
+        },
+      };
+    });
+  };
 
   useEffect(() => {
     if (!ticketId) { setTicket(null); return; }
@@ -472,7 +625,7 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
         <div style={{ display: 'flex', height: '78vh' }}>
           {/* Left — email thread (2/3) */}
           <div style={{ flex: '0 0 67%', overflowY: 'auto', padding: '20px', borderRight: '1px solid #f0f0f0', background: '#fafafa' }}>
-            <DraftCard ticket={ticket} />
+            <DraftCard key={ticket.id} ticket={ticket} onSave={handleDraftSave} />
             <OriginalEmailCard ticket={ticket} />
             <AttachmentsCard ticket={ticket} />
           </div>
