@@ -322,15 +322,25 @@ export interface EmailTicket {
 export interface EmailAttachment {
   id: string;
   filename: string;
-  mimeType: string;
-  size: number;
+  contentType: string;
+  fileSize: number;
 }
 
 export interface EmailDraft {
   id: string;
+  toEmail: string;
+  ccEmails: string[] | null;
   subject: string;
-  body: string;
+  // The backend may put HTML content in bodyText with bodyHtml null
+  bodyText: string | null;
+  bodyHtml: string | null;
   status: string;
+  aiModel: string | null;
+  agentNotes: string | null;
+  editedBy: string | null;
+  editedAt: string | null;
+  sentAt: string | null;
+  gmailMessageId: string | null;
   createdAt: string;
   updatedAt: string | null;
 }

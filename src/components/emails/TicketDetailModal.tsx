@@ -76,7 +76,10 @@ function gmailLabelText(label: string): string {
 
 const DraftCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
   const hasDraft = !!ticket.draft;
-  const draftStatus = ticket.draftStatus;
+  const draftStatus = ticket.draftStatus ?? ticket.draft?.status;
+  // The backend may return HTML in bodyText with bodyHtml null
+  const draftContent = ticket.draft?.bodyHtml || ticket.draft?.bodyText || '';
+  const draftIsHtml = /^\s*</.test(draftContent);
 
   return (
     <div
@@ -110,23 +113,48 @@ const DraftCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
             Re: {ticket.draft!.subject}
           </Text>
           {/* Draft body preview */}
-          <div
-            style={{
-              fontSize: '13px',
-              color: '#262626',
-              lineHeight: 1.6,
-              background: '#fff',
-              border: '1px solid #efdbff',
-              borderRadius: '8px',
-              padding: '12px',
-              maxHeight: '160px',
-              overflowY: 'auto',
-              whiteSpace: 'pre-wrap',
-              marginBottom: '14px',
-            }}
-          >
-            {ticket.draft!.body || '—'}
-          </div>
+          {draftIsHtml ? (
+            <div
+              style={{
+                background: '#fff',
+                border: '1px solid #efdbff',
+                borderRadius: '8px',
+                maxHeight: '320px',
+                overflowY: 'auto',
+                marginBottom: '14px',
+              }}
+            >
+              <iframe
+                srcDoc={draftContent}
+                sandbox="allow-same-origin"
+                style={{ width: '100%', minHeight: '200px', border: 'none', display: 'block' }}
+                title="Draft reply body"
+                onLoad={(e) => {
+                  const iframe = e.currentTarget;
+                  const height = iframe.contentDocument?.body?.scrollHeight;
+                  if (height) iframe.style.height = `${height}px`;
+                }}
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                fontSize: '13px',
+                color: '#262626',
+                lineHeight: 1.6,
+                background: '#fff',
+                border: '1px solid #efdbff',
+                borderRadius: '8px',
+                padding: '12px',
+                maxHeight: '160px',
+                overflowY: 'auto',
+                whiteSpace: 'pre-wrap',
+                marginBottom: '14px',
+              }}
+            >
+              {draftContent || '—'}
+            </div>
+          )}
           {/* Actions */}
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
             <Button size="small" icon={<EditOutlined />} style={{ borderRadius: '7px' }}>
@@ -160,6 +188,15 @@ const DraftCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
 
 const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
   const initials = senderInitials(ticket.senderName);
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+
+  const resizeIframe = () => {
+    const iframe = iframeRef.current;
+    const height = iframe?.contentDocument?.body?.scrollHeight;
+    if (iframe && height) {
+      iframe.style.height = `${height}px`;
+    }
+  };
 
   const collapseLabel = (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -193,6 +230,7 @@ const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
   return (
     <Collapse
       defaultActiveKey={[]}
+      onChange={resizeIframe}
       style={{ borderRadius: '10px', border: '1px solid #f0f0f0', background: '#fff', marginBottom: '12px' }}
       items={[{
         key: 'email',
@@ -201,14 +239,12 @@ const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
           <div>
             {hasHtml ? (
               <iframe
+                ref={iframeRef}
                 srcDoc={ticket.bodyHtml}
                 sandbox="allow-same-origin"
                 style={{ width: '100%', minHeight: '320px', border: 'none', borderRadius: '6px', background: '#fff' }}
                 title="Email body"
-                onLoad={(e) => {
-                  const iframe = e.currentTarget;
-                  iframe.style.height = iframe.contentDocument?.body?.scrollHeight + 'px';
-                }}
+                onLoad={resizeIframe}
               />
             ) : hasText ? (
               <pre style={{ fontSize: '13px', color: '#262626', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, lineHeight: 1.6 }}>
@@ -243,7 +279,7 @@ const AttachmentsCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
             <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', background: '#fafafa', borderRadius: '6px', border: '1px solid #f0f0f0' }}>
               <PaperClipOutlined style={{ color: '#8c8c8c', fontSize: '12px' }} />
               <Text style={{ fontSize: '12px', flex: 1 }}>{a.filename}</Text>
-              <Text type="secondary" style={{ fontSize: '11px' }}>{(a.size / 1024).toFixed(1)} KB</Text>
+              <Text type="secondary" style={{ fontSize: '11px' }}>{(a.fileSize / 1024).toFixed(1)} KB</Text>
             </div>
           ))}
         </div>
