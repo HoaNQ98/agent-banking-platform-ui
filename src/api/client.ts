@@ -6,6 +6,7 @@
 
 import { getConfig } from './config';
 import type { APIError } from './types';
+import { useAuthStore } from '../store/useAuthStore';
 
 export function getAuthHeaders(): Record<string, string> {
   try {
@@ -81,6 +82,13 @@ async function request<T>(
       } catch {
         errorDetail = response.statusText || errorDetail;
       }
+
+      // Auto-logout on 401 Unauthorized (expired/invalid token)
+      if (response.status === 401) {
+        const { isLoggedIn, logout } = useAuthStore.getState();
+        if (isLoggedIn) logout();
+      }
+
       throw new APIException(response.status, errorDetail);
     }
 
