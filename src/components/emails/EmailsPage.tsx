@@ -86,7 +86,7 @@ const EmailsPage: React.FC = () => {
         <div style={{ minWidth: 0 }}>
           <Text
             strong
-            style={{ fontSize: '13px', color: '#262626', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            style={{ fontSize: '13px', color: '#3A3733', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
             {record.senderName}
           </Text>
@@ -106,7 +106,7 @@ const EmailsPage: React.FC = () => {
       ellipsis: true,
       render: (subject: string) => (
         <Tooltip title={subject} placement="topLeft">
-          <Text style={{ fontSize: '13px', color: '#262626' }}>{subject}</Text>
+          <Text style={{ fontSize: '13px', color: '#3A3733' }}>{subject}</Text>
         </Tooltip>
       ),
     },
@@ -151,7 +151,7 @@ const EmailsPage: React.FC = () => {
             size="small"
             icon={<EyeOutlined />}
             onClick={() => setSelectedTicketId(record.id)}
-            style={{ color: '#1677ff' }}
+            style={{ color: '#BC6E4E' }}
           />
         </Tooltip>
       ),
@@ -159,14 +159,14 @@ const EmailsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#fafafa', overflow: 'hidden' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#FAF9F6', overflow: 'hidden' }}>
       {/* Page header */}
       <div
         style={{
           padding: '12px 24px',
           height: '64px',
           background: '#fff',
-          borderBottom: '1px solid #f0f0f0',
+          borderBottom: '1px solid #EDE9E1',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
@@ -174,8 +174,8 @@ const EmailsPage: React.FC = () => {
           boxSizing: 'border-box',
         }}
       >
-        <MailOutlined style={{ color: '#8c8c8c', fontSize: '14px' }} />
-        <span style={{ fontSize: '14px', fontWeight: 600, color: '#262626' }}>Email Tickets</span>
+        <MailOutlined style={{ color: '#8A8578', fontSize: '14px' }} />
+        <span style={{ fontSize: '14px', fontWeight: 600, color: '#3A3733' }}>Email Tickets</span>
       </div>
 
       {/* Filter bar */}
@@ -183,7 +183,7 @@ const EmailsPage: React.FC = () => {
         style={{
           padding: '12px 24px',
           background: '#fff',
-          borderBottom: '1px solid #f0f0f0',
+          borderBottom: '1px solid #EDE9E1',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
@@ -191,7 +191,7 @@ const EmailsPage: React.FC = () => {
           flexShrink: 0,
         }}
       >
-        <FilterOutlined style={{ color: '#8c8c8c', fontSize: '13px' }} />
+        <FilterOutlined style={{ color: '#8A8578', fontSize: '13px' }} />
 
         <Select
           allowClear
@@ -230,7 +230,7 @@ const EmailsPage: React.FC = () => {
             type="link"
             size="small"
             onClick={handleClearFilters}
-            style={{ color: '#8c8c8c', padding: '0 4px', fontSize: '13px' }}
+            style={{ color: '#8A8578', padding: '0 4px', fontSize: '13px' }}
           >
             Clear filters
           </Button>
@@ -245,7 +245,7 @@ const EmailsPage: React.FC = () => {
 
       {/* Table */}
       <div style={{ flex: 1, overflow: 'auto', padding: '16px 24px' }}>
-        <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #f0f0f0' }}>
+        <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #EDE9E1' }}>
         <Table<EmailTicket>
           rowKey="id"
           dataSource={tickets}
@@ -269,7 +269,7 @@ const EmailsPage: React.FC = () => {
           onRow={(record) => ({
             style: { cursor: 'default' },
             onMouseEnter: (e) => {
-              (e.currentTarget as HTMLElement).style.backgroundColor = '#fafafa';
+              (e.currentTarget as HTMLElement).style.backgroundColor = '#F5F3EE';
             },
             onMouseLeave: (e) => {
               (e.currentTarget as HTMLElement).style.backgroundColor = '';
@@ -286,7 +286,7 @@ const EmailsPage: React.FC = () => {
               </div>
             ) : (
               <div style={{ padding: '48px 0', textAlign: 'center' }}>
-                <MailOutlined style={{ fontSize: '36px', color: '#9CA3AF', marginBottom: '12px', display: 'block' }} />
+                <MailOutlined style={{ fontSize: '36px', color: '#B7B0A3', marginBottom: '12px', display: 'block' }} />
                 <Text type="secondary">No tickets found</Text>
                 {hasActiveFilters && (
                   <div style={{ marginTop: '8px' }}>

@@ -37,18 +37,18 @@ function senderInitials(name: string): string {
 // ─── Shared MetaRow ──────────────────────────────────────────────────────────
 
 const MetaRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '7px 0', borderBottom: '1px solid #f5f5f5' }}>
+  <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '7px 0', borderBottom: '1px solid #F0ECE3' }}>
     <Text type="secondary" style={{ fontSize: '11px', fontWeight: 600, minWidth: '90px', flexShrink: 0, paddingTop: '2px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
       {label}
     </Text>
-    <div style={{ fontSize: '13px', color: '#262626', flex: 1 }}>{children}</div>
+    <div style={{ fontSize: '13px', color: '#3A3733', flex: 1 }}>{children}</div>
   </div>
 );
 
 // ─── Section label ────────────────────────────────────────────────────────────
 
 const SectionLabel: React.FC<{ icon?: React.ReactNode; children: React.ReactNode }> = ({ icon, children }) => (
-  <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#8c8c8c', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+  <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#8A8578', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
     {icon}{children}
   </div>
 );
@@ -174,8 +174,8 @@ const DraftCard: React.FC<{
     <div
       style={{
         borderRadius: '10px',
-        border: hasDraft ? '1px solid #d3adf7' : '1px solid #f0f0f0',
-        background: hasDraft ? '#f9f0ff' : '#fafafa',
+        border: hasDraft ? '1px solid #d3adf7' : '1px solid #EDE9E1',
+        background: hasDraft ? '#f9f0ff' : '#F5F3EE',
         padding: '16px',
         marginBottom: '12px',
       }}
@@ -183,8 +183,8 @@ const DraftCard: React.FC<{
       {/* Card header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <RobotOutlined style={{ color: hasDraft ? '#722ed1' : '#bfbfbf', fontSize: '15px' }} />
-          <Text strong style={{ fontSize: '13px', color: hasDraft ? '#531dab' : '#8c8c8c' }}>
+          <RobotOutlined style={{ color: hasDraft ? '#722ed1' : '#B7B0A3', fontSize: '15px' }} />
+          <Text strong style={{ fontSize: '13px', color: hasDraft ? '#531dab' : '#8A8578' }}>
             AI Draft Reply
           </Text>
         </div>
@@ -248,7 +248,7 @@ const DraftCard: React.FC<{
             <div
               style={{
                 fontSize: '13px',
-                color: '#262626',
+                color: '#3A3733',
                 lineHeight: 1.6,
                 background: '#fff',
                 border: '1px solid #efdbff',
@@ -282,9 +282,9 @@ const DraftCard: React.FC<{
                   onClick={handleSave}
                   style={{
                     borderRadius: '7px',
-                    background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 100%)',
+                    background: 'linear-gradient(135deg, #A85E3E 0%, #C67A54 100%)',
                     border: 'none',
-                    boxShadow: '0 2px 6px rgba(0,71,171,0.25)',
+                    boxShadow: '0 2px 6px rgba(168,94,62,0.25)',
                   }}
                 >
                   Save Draft
@@ -301,9 +301,9 @@ const DraftCard: React.FC<{
                   icon={<SendOutlined />}
                   style={{
                     borderRadius: '7px',
-                    background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 100%)',
+                    background: 'linear-gradient(135deg, #A85E3E 0%, #C67A54 100%)',
                     border: 'none',
-                    boxShadow: '0 2px 6px rgba(0,71,171,0.25)',
+                    boxShadow: '0 2px 6px rgba(168,94,62,0.25)',
                   }}
                 >
                   Send
@@ -342,7 +342,7 @@ const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
           width: '32px',
           height: '32px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+          background: 'linear-gradient(135deg, #C67A54 0%, #C9A05E 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -355,7 +355,7 @@ const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
         {initials}
       </div>
       <div style={{ minWidth: 0 }}>
-        <Text strong style={{ fontSize: '13px', color: '#262626', display: 'block' }}>{ticket.senderName}</Text>
+        <Text strong style={{ fontSize: '13px', color: '#3A3733', display: 'block' }}>{ticket.senderName}</Text>
         <Text type="secondary" style={{ fontSize: '11px' }}>{ticket.senderEmail} · {formatDateTime(ticket.receivedAt)}</Text>
       </div>
     </div>
@@ -368,7 +368,7 @@ const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
     <Collapse
       defaultActiveKey={[]}
       onChange={resizeIframe}
-      style={{ borderRadius: '10px', border: '1px solid #f0f0f0', background: '#fff', marginBottom: '12px' }}
+      style={{ borderRadius: '10px', border: '1px solid #EDE9E1', background: '#fff', marginBottom: '12px' }}
       items={[{
         key: 'email',
         label: collapseLabel,
@@ -384,7 +384,7 @@ const OriginalEmailCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
                 onLoad={resizeIframe}
               />
             ) : hasText ? (
-              <pre style={{ fontSize: '13px', color: '#262626', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, lineHeight: 1.6 }}>
+              <pre style={{ fontSize: '13px', color: '#3A3733', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, lineHeight: 1.6 }}>
                 {ticket.bodyText}
               </pre>
             ) : (
@@ -403,18 +403,18 @@ const AttachmentsCard: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
   const attachments = ticket.attachments ?? [];
 
   return (
-    <div style={{ borderRadius: '10px', border: '1px solid #f0f0f0', background: '#fff', padding: '12px 16px', marginBottom: '12px' }}>
+    <div style={{ borderRadius: '10px', border: '1px solid #EDE9E1', background: '#fff', padding: '12px 16px', marginBottom: '12px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: attachments.length ? '10px' : 0 }}>
-        <PaperClipOutlined style={{ color: '#8c8c8c', fontSize: '13px' }} />
-        <Text style={{ fontSize: '13px', color: '#595959', fontWeight: 500 }}>
+        <PaperClipOutlined style={{ color: '#8A8578', fontSize: '13px' }} />
+        <Text style={{ fontSize: '13px', color: '#6B665C', fontWeight: 500 }}>
           Attachments ({attachments.length})
         </Text>
       </div>
       {attachments.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {attachments.map((a) => (
-            <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', background: '#fafafa', borderRadius: '6px', border: '1px solid #f0f0f0' }}>
-              <PaperClipOutlined style={{ color: '#8c8c8c', fontSize: '12px' }} />
+            <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', background: '#F5F3EE', borderRadius: '6px', border: '1px solid #EDE9E1' }}>
+              <PaperClipOutlined style={{ color: '#8A8578', fontSize: '12px' }} />
               <Text style={{ fontSize: '12px', flex: 1 }}>{a.filename}</Text>
               <Text type="secondary" style={{ fontSize: '11px' }}>{(a.fileSize / 1024).toFixed(1)} KB</Text>
             </div>
@@ -473,7 +473,7 @@ const TicketInfoPanel: React.FC<{ ticket: EmailTicket }> = ({ ticket }) => {
       <SectionLabel icon={<MailOutlined style={{ fontSize: '10px' }} />}>Sender</SectionLabel>
       <MetaRow label="Name">{ticket.senderName || '—'}</MetaRow>
       <MetaRow label="Email">
-        <a href={`mailto:${ticket.senderEmail}`} style={{ color: '#1677ff', fontSize: '12px', wordBreak: 'break-all' }}>
+        <a href={`mailto:${ticket.senderEmail}`} style={{ color: '#BC6E4E', fontSize: '12px', wordBreak: 'break-all' }}>
           {ticket.senderEmail}
         </a>
       </MetaRow>
@@ -560,7 +560,7 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
       <div
         style={{
           padding: '14px 20px',
-          borderBottom: '1px solid #f0f0f0',
+          borderBottom: '1px solid #EDE9E1',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -569,9 +569,9 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-          <MailOutlined style={{ color: '#8c8c8c', fontSize: '14px', flexShrink: 0 }} />
+          <MailOutlined style={{ color: '#8A8578', fontSize: '14px', flexShrink: 0 }} />
           <div style={{ minWidth: 0 }}>
-            <Text strong style={{ fontSize: '14px', color: '#262626', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Text strong style={{ fontSize: '14px', color: '#3A3733', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {ticket?.subject ?? '—'}
             </Text>
             {ticket && (
@@ -588,9 +588,9 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
             width: '28px',
             height: '28px',
             borderRadius: '50%',
-            background: '#f5f5f5',
+            background: '#F0ECE3',
             border: '1px solid #e8e8e8',
-            color: '#595959',
+            color: '#6B665C',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -599,7 +599,7 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
             transition: 'background 0.15s',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = '#ebebeb')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = '#f5f5f5')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = '#F0ECE3')}
         >
           ✕
         </button>
@@ -624,7 +624,7 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticketId, onClose
       {!loading && !error && ticket && (
         <div style={{ display: 'flex', height: '78vh' }}>
           {/* Left — email thread (2/3) */}
-          <div style={{ flex: '0 0 67%', overflowY: 'auto', padding: '20px', borderRight: '1px solid #f0f0f0', background: '#fafafa' }}>
+          <div style={{ flex: '0 0 67%', overflowY: 'auto', padding: '20px', borderRight: '1px solid #EDE9E1', background: '#F5F3EE' }}>
             <DraftCard key={ticket.id} ticket={ticket} onSave={handleDraftSave} />
             <OriginalEmailCard ticket={ticket} />
             <AttachmentsCard ticket={ticket} />

@@ -56,8 +56,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                         gap: '10px',
                         padding: '8px 12px',
                         borderRadius: '12px',
-                        background: '#fff',
-                        border: '1px solid #e8e8e8',
+                        background: '#FFFDFA',
+                        border: '1px solid #E4DFD5',
                         minWidth: '160px',
                         maxWidth: '220px',
                       }}
@@ -68,8 +68,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                           width: '32px',
                           height: '32px',
                           borderRadius: '6px',
-                          background: '#f0f7ff',
-                          border: '1px solid #bae0ff',
+                          background: '#F6ECE4',
+                          border: '1px solid #E4C9B5',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -85,7 +85,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                           style={{
                             fontSize: '12px',
                             fontWeight: 500,
-                            color: '#1a1a2e',
+                            color: '#3A3733',
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -93,7 +93,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                         >
                           {file.name ?? 'Unnamed file'}
                         </div>
-                        <div style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '1px' }}>
+                        <div style={{ fontSize: '11px', color: '#8A8578', marginTop: '1px' }}>
                           {ext} File
                         </div>
                       </div>
@@ -110,8 +110,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                   padding: '12px 18px',
                   borderRadius: '18px',
                   borderBottomRightRadius: '4px',
-                  border: '1.5px solid #91caff',
-                  color: '#1a1a2e',
+                  background: '#F6ECE4',
+                  color: '#3A3733',
                   fontSize: '14px',
                   lineHeight: '1.7',
                   fontWeight: 450,
@@ -126,9 +126,9 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           <div style={{ width: '100%', paddingLeft: '16px', paddingRight: '16px' }}>
             {showLoadingDots ? (
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center', padding: '4px 0' }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#bfbfbf', animation: 'dotPulse 1.4s infinite ease-in-out' }} />
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#bfbfbf', animation: 'dotPulse 1.4s infinite ease-in-out 0.2s' }} />
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#bfbfbf', animation: 'dotPulse 1.4s infinite ease-in-out 0.4s' }} />
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#B7B0A3', animation: 'dotPulse 1.4s infinite ease-in-out' }} />
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#B7B0A3', animation: 'dotPulse 1.4s infinite ease-in-out 0.2s' }} />
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#B7B0A3', animation: 'dotPulse 1.4s infinite ease-in-out 0.4s' }} />
               </div>
             ) : (
               <>
@@ -154,10 +154,10 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                           gap: '6px',
                           padding: '6px 12px',
                           borderRadius: '8px',
-                          background: '#f7f9fc',
-                          border: '1px solid #e8e8e8',
+                          background: '#F5F3EE',
+                          border: '1px solid #E4DFD5',
                           fontSize: '12px',
-                          color: '#595959',
+                          color: '#6B665C',
                         }}
                       >
                         <FileOutlined style={{ fontSize: '14px' }} />
@@ -180,7 +180,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                       marginTop: '12px',
                       padding: '12px 16px',
                       borderRadius: '12px',
-                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      border: '1px solid rgba(188, 110, 78, 0.25)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '10px',
@@ -189,12 +189,12 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                       background: 'transparent',
                     }}
                     onMouseEnter={e => {
-                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(102, 126, 234, 0.04)';
-                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(102, 126, 234, 0.4)';
+                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(188, 110, 78, 0.06)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(188, 110, 78, 0.45)';
                     }}
                     onMouseLeave={e => {
                       (e.currentTarget as HTMLDivElement).style.background = 'transparent';
-                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(188, 110, 78, 0.25)';
                     }}
                   >
                     <div
@@ -202,7 +202,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                         width: '32px',
                         height: '32px',
                         borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        background: 'linear-gradient(135deg, #C67A54 0%, #A85E3E 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -212,12 +212,12 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                       <FileSearchOutlined style={{ color: '#fff', fontSize: '15px' }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '12px', color: '#8c8c8c', lineHeight: '1.3' }}>Document</div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#262626', lineHeight: '1.4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: '12px', color: '#8A8578', lineHeight: '1.3' }}>Document</div>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#3A3733', lineHeight: '1.4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {ArtifactTypeLabel[message.artifact.artifactType as ArtifactTypeValue] ?? 'Review Artifact'}
                       </div>
                     </div>
-                    <ArrowRightOutlined style={{ color: '#667eea', fontSize: '13px', flexShrink: 0 }} />
+                    <ArrowRightOutlined style={{ color: '#BC6E4E', fontSize: '13px', flexShrink: 0 }} />
                   </div>
                 )}
               </>

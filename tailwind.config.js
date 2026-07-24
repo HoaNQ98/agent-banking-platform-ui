@@ -7,23 +7,29 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Warm clay accent — tuned to feel like the Claude reference UI
         primary: {
-          DEFAULT: '#0047AB',
-          dark: '#002D6B',
-          light: '#E6F0FF',
+          DEFAULT: '#BC6E4E',
+          dark: '#A85E3E',
+          light: '#F3E7DF',
         },
         secondary: {
           green: '#00A86B',
           gold: '#D4AF37',
           teal: '#008B8B',
         },
+        // Warm-tinted neutrals (a slight bias toward the clay accent)
+        canvas: '#FAF9F6',
+        surface: '#F5F3EE',
+        blush: '#F6ECE4',
         gray: {
-          50: '#F9FAFB',
-          100: '#F3F4F6',
-          200: '#E5E7EB',
-          400: '#9CA3AF',
-          600: '#4B5563',
-          900: '#111827',
+          50: '#FAF9F6',
+          100: '#F5F3EE',
+          200: '#EDE9E1',
+          300: '#E4DFD5',
+          400: '#B7B0A3',
+          600: '#8A8578',
+          900: '#3A3733',
         },
         semantic: {
           error: '#DC2626',

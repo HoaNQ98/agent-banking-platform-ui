@@ -33,7 +33,7 @@ const DocumentReviewPanel: React.FC = () => {
   const issueCount = criticalCount + warningCount;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fafafa' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#F5F3EE' }}>
       {/* Header */}
       <div
         style={{
@@ -43,11 +43,11 @@ const DocumentReviewPanel: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           flexShrink: 0,
-          borderBottom: '1px solid #f0f0f0',
+          borderBottom: '1px solid #EDE9E1',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: '#262626' }}>Document Review</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: '#3A3733' }}>Document Review</span>
           <span style={{ fontSize: 12, color: issueCount > 0 ? '#fa8c16' : '#52c41a' }}>
             · {issueCount > 0 ? `${issueCount} issue${issueCount > 1 ? 's' : ''}` : 'All clear'}
           </span>
@@ -57,7 +57,7 @@ const DocumentReviewPanel: React.FC = () => {
           size="small"
           icon={<CloseOutlined style={{ fontSize: 12 }} />}
           onClick={handleClose}
-          style={{ color: '#8c8c8c' }}
+          style={{ color: '#8A8578' }}
         />
       </div>
 
@@ -68,14 +68,14 @@ const DocumentReviewPanel: React.FC = () => {
         <div
           style={{
             width: '42%',
-            borderRight: '1px solid #f0f0f0',
+            borderRight: '1px solid #EDE9E1',
             overflowY: 'auto',
             padding: '12px 10px',
             flexShrink: 0,
-            background: '#fafafa',
+            background: '#F5F3EE',
           }}
         >
-          <span style={{ fontSize: 11, color: '#bfbfbf', display: 'block', marginBottom: 10, paddingLeft: 4 }}>
+          <span style={{ fontSize: 11, color: '#B7B0A3', display: 'block', marginBottom: 10, paddingLeft: 4 }}>
             {reviewData.length} field{reviewData.length > 1 ? 's' : ''} extracted
           </span>
           {reviewData.map((field, i) => (
@@ -89,8 +89,8 @@ const DocumentReviewPanel: React.FC = () => {
         </div>
 
         {/* Right: document viewer — rounded inset */}
-        <div style={{ flex: 1, overflow: 'hidden', padding: '10px', background: '#fafafa' }}>
-          <div style={{ height: '100%', borderRadius: 12, overflow: 'hidden', background: '#fff', border: '1px solid #f0f0f0' }}>
+        <div style={{ flex: 1, overflow: 'hidden', padding: '10px', background: '#F5F3EE' }}>
+          <div style={{ height: '100%', borderRadius: 12, overflow: 'hidden', background: '#fff', border: '1px solid #EDE9E1' }}>
             {activeSource?.sourceType === 'regulation' && (() => {
               const path = getRegulationPath(activeSource.docName);
               return path ? (
@@ -134,7 +134,7 @@ const DocumentReviewPanel: React.FC = () => {
                 />
               ) : (
                 <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 13, color: '#bfbfbf' }}>
+                  <span style={{ fontSize: 13, color: '#B7B0A3' }}>
                     Click a source tag to view the document
                   </span>
                 </div>

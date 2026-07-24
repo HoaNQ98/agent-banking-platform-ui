@@ -20,7 +20,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
     <div
       style={{
         fontSize: '14px',
-        color: isUser ? '#1a1a2e' : '#262626',
+        color: isUser ? '#3A3733' : '#3A3733',
         lineHeight: '1.6',
       }}
     >
@@ -36,7 +36,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
                 fontWeight: 'bold',
                 marginTop: '0.5em',
                 marginBottom: '0.5em',
-                color: isUser ? '#1a1a2e' : '#1a1a1a',
+                color: isUser ? '#3A3733' : '#2B2925',
               }}
               {...props}
             />
@@ -48,7 +48,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
                 fontWeight: 'bold',
                 marginTop: '0.5em',
                 marginBottom: '0.5em',
-                color: isUser ? '#1a1a2e' : '#1a1a1a',
+                color: isUser ? '#3A3733' : '#2B2925',
               }}
               {...props}
             />
@@ -60,7 +60,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
                 fontWeight: 'bold',
                 marginTop: '0.5em',
                 marginBottom: '0.5em',
-                color: isUser ? '#1a1a2e' : '#1a1a1a',
+                color: isUser ? '#3A3733' : '#2B2925',
               }}
               {...props}
             />
@@ -86,12 +86,12 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
             return isInline ? (
               <code
                 style={{
-                  backgroundColor: isUser ? 'rgba(26, 26, 46, 0.08)' : '#eff1f3',
+                  backgroundColor: isUser ? 'rgba(58, 55, 51, 0.08)' : '#F0ECE3',
                   padding: '2px 6px',
                   borderRadius: '4px',
                   fontFamily: 'monospace',
                   fontSize: '0.9em',
-                  color: isUser ? '#1a1a2e' : '#d73a49',
+                  color: isUser ? '#3A3733' : '#A85E3E',
                 }}
                 {...props}
               >
@@ -102,8 +102,8 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
                 className={className}
                 style={{
                   display: 'block',
-                  backgroundColor: isUser ? 'rgba(26, 26, 46, 0.06)' : '#f6f8fa',
-                  color: isUser ? '#1a1a2e' : '#24292e',
+                  backgroundColor: isUser ? 'rgba(58, 55, 51, 0.06)' : '#F5F2EC',
+                  color: isUser ? '#3A3733' : '#2B2925',
                   padding: '12px',
                   borderRadius: '6px',
                   overflow: 'auto',
@@ -163,7 +163,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
           a: ({ node, ...props }) => (
             <a
               style={{
-                color: isUser ? '#1677ff' : '#1890ff',
+                color: isUser ? '#A85E3E' : '#BC6E4E',
                 textDecoration: 'underline',
                 fontWeight: '500',
               }}
@@ -178,8 +178,8 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
               style={{
                 margin: '0.5em 0',
                 paddingLeft: '1em',
-                borderLeft: `3px solid ${isUser ? '#91caff' : '#d9d9d9'}`,
-                color: isUser ? '#595959' : '#8c8c8c',
+                borderLeft: `3px solid ${isUser ? '#DDBBA6' : '#D6D0C4'}`,
+                color: isUser ? '#6B665C' : '#8A8578',
                 fontStyle: 'italic',
               }}
               {...props}
@@ -192,7 +192,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
                 style={{
                   borderCollapse: 'collapse',
                   width: '100%',
-                  border: `1px solid ${isUser ? '#bae0ff' : '#f0f0f0'}`,
+                  border: `1px solid ${isUser ? '#E4C9B5' : '#EDE9E1'}`,
                 }}
                 {...props}
               />
@@ -201,9 +201,9 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
           th: ({ node, ...props }) => (
             <th
               style={{
-                border: `1px solid ${isUser ? '#bae0ff' : '#f0f0f0'}`,
+                border: `1px solid ${isUser ? '#E4C9B5' : '#EDE9E1'}`,
                 padding: '8px',
-                backgroundColor: isUser ? '#f0f7ff' : '#fafafa',
+                backgroundColor: isUser ? '#F6ECE4' : '#F5F3EE',
                 fontWeight: 'bold',
                 textAlign: 'left',
               }}
@@ -213,7 +213,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
           td: ({ node, ...props }) => (
             <td
               style={{
-                border: `1px solid ${isUser ? '#bae0ff' : '#f0f0f0'}`,
+                border: `1px solid ${isUser ? '#E4C9B5' : '#EDE9E1'}`,
                 padding: '8px',
               }}
               {...props}
@@ -224,7 +224,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
             <hr
               style={{
                 border: 'none',
-                borderTop: `1px solid ${isUser ? '#bae0ff' : '#f0f0f0'}`,
+                borderTop: `1px solid ${isUser ? '#E4C9B5' : '#EDE9E1'}`,
                 margin: '1em 0',
               }}
               {...props}
@@ -243,7 +243,7 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({
             display: 'inline-block',
             width: '8px',
             height: '16px',
-            backgroundColor: isUser ? '#1a1a2e' : '#1890ff',
+            backgroundColor: isUser ? '#3A3733' : '#BC6E4E',
             marginLeft: '3px',
             borderRadius: '2px',
             animation: 'smoothBlink 1.2s ease-in-out infinite',

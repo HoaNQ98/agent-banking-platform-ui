@@ -87,9 +87,10 @@ const ChatInput: React.FC = () => {
   return (
     <div
       style={{
-        background: '#fff',
+        background: '#FFFDFA',
+        border: '1px solid #E4DFD5',
         borderRadius: '16px',
-        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 1px 3px rgba(60,45,30,0.05), 0 1px 2px rgba(60,45,30,0.03)',
         padding: '12px 16px',
       }}
       >
@@ -127,7 +128,7 @@ const ChatInput: React.FC = () => {
             <Button
               type="text"
               icon={<PaperClipOutlined style={{ fontSize: '18px' }} />}
-              style={{ height: '40px', width: '40px', flexShrink: 0, color: '#8c8c8c' }}
+              style={{ height: '40px', width: '40px', flexShrink: 0, color: '#8A8578' }}
               disabled={!activeConversationId}
             />
           </Upload>

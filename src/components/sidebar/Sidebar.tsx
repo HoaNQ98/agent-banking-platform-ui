@@ -59,12 +59,12 @@ const Sidebar: React.FC = () => {
   const isEmpty = remoteConversations.length === 0 && !isLoadingConversations;
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#fafafa' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#F5F3EE' }}>
       {/* Header */}
       <div
         style={{
           padding: '12px 16px',
-          borderBottom: '1px solid #f0f0f0',
+          borderBottom: '1px solid #EDE9E1',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -76,7 +76,7 @@ const Sidebar: React.FC = () => {
             style={{
               width: '28px',
               height: '28px',
-              background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+              background: 'linear-gradient(135deg, #C67A54 0%, #B0894A 100%)',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -101,7 +101,7 @@ const Sidebar: React.FC = () => {
             icon={<PlusOutlined />}
             onClick={handleNewConversation}
             aria-label="New conversation"
-            style={{ color: '#595959' }}
+            style={{ color: '#6B665C' }}
           />
           <Button
             type="text"
@@ -109,7 +109,7 @@ const Sidebar: React.FC = () => {
             icon={<LeftOutlined />}
             onClick={toggleSidebar}
             aria-label="Collapse sidebar"
-            style={{ color: '#595959' }}
+            style={{ color: '#6B665C' }}
           />
         </div>
       </div>
@@ -192,8 +192,8 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ icon, label, active, onClick 
       borderRadius: '10px',
       border: 'none',
       cursor: 'pointer',
-      background: active ? '#e6f4ff' : 'transparent',
-      color: active ? '#1677ff' : '#262626',
+      background: active ? '#F3E7DF' : 'transparent',
+      color: active ? '#BC6E4E' : '#3A3733',
       fontWeight: active ? 600 : 400,
       fontSize: '14px',
       transition: 'background-color 0.15s ease',
@@ -201,13 +201,13 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ icon, label, active, onClick 
       marginBottom: '2px',
     }}
     onMouseEnter={(e) => {
-      if (!active) e.currentTarget.style.backgroundColor = '#f0f0f0';
+      if (!active) e.currentTarget.style.backgroundColor = '#ECE7DD';
     }}
     onMouseLeave={(e) => {
       if (!active) e.currentTarget.style.backgroundColor = 'transparent';
     }}
   >
-    <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', color: active ? '#1677ff' : '#595959' }}>
+    <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', color: active ? '#BC6E4E' : '#8A8578' }}>
       {icon}
     </span>
     {label}

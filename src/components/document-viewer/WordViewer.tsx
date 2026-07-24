@@ -112,8 +112,8 @@ const WordViewer: React.FC<WordViewerProps> = ({ src, label }) => {
       <div
         style={{
           padding: '10px 16px',
-          borderBottom: '1px solid #f0f0f0',
-          background: '#fafafa',
+          borderBottom: '1px solid #EDE9E1',
+          background: '#F5F3EE',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
@@ -133,7 +133,7 @@ const WordViewer: React.FC<WordViewerProps> = ({ src, label }) => {
           flex: 1,
           overflowY: 'auto',
           overflowX: 'hidden',
-          background: '#f0f0f0',
+          background: '#EDE9E1',
           padding: '16px',
           display: viewerState === 'loading' ? 'flex' : 'block',
           justifyContent: 'center',

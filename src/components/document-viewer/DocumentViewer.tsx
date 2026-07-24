@@ -40,15 +40,15 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ src, mimeType, label, p
       <div
         style={{
           padding: '10px 16px',
-          borderBottom: '1px solid #f0f0f0',
-          background: '#fafafa',
+          borderBottom: '1px solid #EDE9E1',
+          background: '#F5F3EE',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
           flexShrink: 0,
         }}
       >
-        <FileTextOutlined style={{ color: '#8c8c8c' }} />
+        <FileTextOutlined style={{ color: '#8A8578' }} />
         <Text style={{ fontSize: 13, flex: 1 }} ellipsis>
           {label ?? src}
         </Text>
@@ -59,10 +59,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ src, mimeType, label, p
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#f5f5f5',
+          background: '#F0ECE3',
         }}
       >
-        <div style={{ textAlign: 'center', color: '#bfbfbf' }}>
+        <div style={{ textAlign: 'center', color: '#B7B0A3' }}>
           <FileTextOutlined style={{ fontSize: 48, marginBottom: 12 }} />
           <div>
             <Text type="secondary" style={{ fontSize: 13 }}>

@@ -54,7 +54,7 @@ export const CategoryTag: React.FC<{ category: EmailCategory }> = ({ category })
 );
 
 export const DraftStatusBadge: React.FC<{ draftStatus: string | null }> = ({ draftStatus }) => {
-  if (!draftStatus) return <span style={{ color: '#bfbfbf', fontSize: '12px' }}>—</span>;
+  if (!draftStatus) return <span style={{ color: '#B7B0A3', fontSize: '12px' }}>—</span>;
   return (
     <span style={{ fontSize: '12px', color: '#722ed1', fontStyle: 'italic' }}>{draftStatus}</span>
   );
@@ -63,7 +63,7 @@ export const DraftStatusBadge: React.FC<{ draftStatus: string | null }> = ({ dra
 const MAX_VISIBLE_TAGS = 2;
 
 export const TagsList: React.FC<{ tags: string[] | null }> = ({ tags }) => {
-  if (!tags || tags.length === 0) return <span style={{ color: '#bfbfbf', fontSize: '12px' }}>—</span>;
+  if (!tags || tags.length === 0) return <span style={{ color: '#B7B0A3', fontSize: '12px' }}>—</span>;
 
   const visible = tags.slice(0, MAX_VISIBLE_TAGS);
   const overflow = tags.length - MAX_VISIBLE_TAGS;

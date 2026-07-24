@@ -95,7 +95,7 @@ const SidebarFooter: React.FC = () => {
               textAlign: 'left',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f5f5f5';
+              e.currentTarget.style.backgroundColor = '#ECE7DD';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
@@ -105,8 +105,8 @@ const SidebarFooter: React.FC = () => {
               size={40}
               style={{
                 background: isLoggedIn
-                  ? 'linear-gradient(135deg, #0047AB 0%, #13c2c2 100%)'
-                  : 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                  ? 'linear-gradient(135deg, #A85E3E 0%, #B0894A 100%)'
+                  : 'linear-gradient(135deg, #C67A54 0%, #C9A05E 100%)',
                 fontSize: '22px',
                 display: 'flex',
                 alignItems: 'center',
@@ -142,7 +142,7 @@ const SidebarFooter: React.FC = () => {
                 {displaySub}
               </Text>
             </div>
-            <SettingOutlined style={{ color: '#bfbfbf', flexShrink: 0 }} />
+            <SettingOutlined style={{ color: '#B7B0A3', flexShrink: 0 }} />
           </Button>
         </Dropdown>
       </div>

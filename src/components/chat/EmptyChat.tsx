@@ -88,7 +88,7 @@ const EmptyChat: React.FC = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#fafafa',
+        background: '#FAF9F6',
         padding: '0 24px',
       }}
     >
@@ -98,18 +98,16 @@ const EmptyChat: React.FC = () => {
           <h1
             style={{
               fontSize: '32px',
-              fontWeight: 700,
+              fontWeight: 500,
               margin: '0 0 10px',
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #1677ff 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              letterSpacing: '-0.5px',
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              color: '#3A3733',
+              letterSpacing: '0.2px',
             }}
           >
             {getGreeting()}
           </h1>
-          <p style={{ fontSize: '15px', color: '#8c8c8c', margin: 0, fontWeight: 400 }}>
+          <p style={{ fontSize: '15px', color: '#8A8578', margin: 0, fontWeight: 400 }}>
             How can I help you today?
           </p>
         </div>
@@ -133,30 +131,30 @@ const EmptyChat: React.FC = () => {
                 gap: '8px',
                 padding: '12px 16px',
                 borderRadius: '12px',
-                border: '1.5px solid #e8e8e8',
-                background: '#fff',
-                color: '#595959',
+                border: '1.5px solid #E4DFD5',
+                background: '#FFFDFA',
+                color: '#6B665C',
                 fontSize: '13px',
                 fontWeight: 450,
                 cursor: 'pointer',
                 textAlign: 'left',
                 lineHeight: '1.5',
                 transition: 'all 0.15s ease',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                boxShadow: '0 1px 3px rgba(60,45,30,0.04)',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
-                el.style.borderColor = '#91caff';
-                el.style.color = '#1677ff';
-                el.style.background = '#f0f7ff';
-                el.style.boxShadow = '0 2px 8px rgba(22,119,255,0.1)';
+                el.style.borderColor = '#DDBBA6';
+                el.style.color = '#BC6E4E';
+                el.style.background = '#F6ECE4';
+                el.style.boxShadow = '0 2px 8px rgba(188,110,78,0.10)';
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
-                el.style.borderColor = '#e8e8e8';
-                el.style.color = '#595959';
-                el.style.background = '#fff';
-                el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+                el.style.borderColor = '#E4DFD5';
+                el.style.color = '#6B665C';
+                el.style.background = '#FFFDFA';
+                el.style.boxShadow = '0 1px 3px rgba(60,45,30,0.04)';
               }}
             >
               <span style={{ fontSize: '16px', lineHeight: 1 }}>{s.icon}</span>
@@ -168,9 +166,10 @@ const EmptyChat: React.FC = () => {
         {/* Input */}
         <div
           style={{
-            background: '#fff',
+            background: '#FFFDFA',
+            border: '1px solid #E4DFD5',
             borderRadius: '16px',
-            boxShadow: '0 2px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
+            boxShadow: '0 1px 3px rgba(60,45,30,0.05), 0 1px 2px rgba(60,45,30,0.03)',
             padding: '12px 16px',
           }}
         >
@@ -194,7 +193,7 @@ const EmptyChat: React.FC = () => {
               <Button
                 type="text"
                 icon={<PaperClipOutlined style={{ fontSize: '18px' }} />}
-                style={{ height: '40px', width: '40px', flexShrink: 0, color: '#8c8c8c' }}
+                style={{ height: '40px', width: '40px', flexShrink: 0, color: '#8A8578' }}
               />
             </Upload>
             <TextArea

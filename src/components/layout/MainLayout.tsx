@@ -48,8 +48,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
           <Sider
             width={LAYOUT.SIDEBAR_WIDTH}
             style={{
-              background: '#fafafa',
-              borderRight: '1px solid #f0f0f0',
+              background: '#F5F3EE',
+              borderRight: '1px solid #EDE9E1',
               overflow: 'auto',
               flexShrink: 0,
             }}
@@ -80,8 +80,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
                 top: 0,
                 left: 0,
                 bottom: 0,
-                background: '#fafafa',
-                borderRight: '1px solid #f0f0f0',
+                background: '#F5F3EE',
+                borderRight: '1px solid #EDE9E1',
                 overflow: 'auto',
                 zIndex: 1000,
                 boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
@@ -104,7 +104,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
               top: '16px',
               left: '12px',
               zIndex: 50,
-              color: '#8c8c8c',
+              color: '#8A8578',
               background: 'transparent',
             }}
           />
@@ -121,7 +121,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
               top: '12px',
               left: '12px',
               zIndex: 50,
-              color: '#8c8c8c',
+              color: '#8A8578',
               fontSize: '18px',
               lineHeight: 1,
             }}
@@ -134,7 +134,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
         <Content
           style={{
             overflow: 'hidden',
-            background: '#fafafa',
+            background: '#FAF9F6',
             flex: isReviewOpen ? '0 0 33%' : '1 1 0%',
             transition: 'flex 300ms ease',
             minWidth: 0,
@@ -148,7 +148,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
           style={{
             flex: isReviewOpen ? '0 0 67%' : '0 0 0%',
             overflow: 'hidden',
-            borderLeft: isReviewOpen ? '1px solid #f0f0f0' : 'none',
+            borderLeft: isReviewOpen ? '1px solid #EDE9E1' : 'none',
             transform: isReviewOpen ? 'translateX(0)' : 'translateX(100%)',
             transition: 'flex 300ms ease, transform 300ms ease',
             minWidth: 0,

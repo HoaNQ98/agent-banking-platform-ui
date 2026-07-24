@@ -4,16 +4,18 @@ import { ConfigProvider } from 'antd';
 import MainLayout from './components/layout/MainLayout';
 import EmailsPage from './components/emails/EmailsPage';
 
-// Ant Design theme configuration based on design specs
+// Ant Design theme configuration — warm clay palette (Claude-like)
 const theme = {
   token: {
-    colorPrimary: '#0047AB',
+    colorPrimary: '#BC6E4E',
     colorSuccess: '#10B981',
     colorWarning: '#F59E0B',
     colorError: '#DC2626',
     colorInfo: '#3B82F6',
-    colorTextBase: '#111827',
+    colorTextBase: '#3A3733',
     colorBgBase: '#FFFFFF',
+    colorBorder: '#E4DFD5',
+    colorBorderSecondary: '#EDE9E1',
     fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     fontSize: 14,
     borderRadius: 8,
@@ -22,7 +24,7 @@ const theme = {
     Button: {
       controlHeight: 40,
       borderRadius: 8,
-      primaryShadow: '0 2px 0 rgba(0, 71, 171, 0.1)',
+      primaryShadow: '0 2px 0 rgba(188, 110, 78, 0.1)',
     },
     Input: {
       controlHeight: 40,

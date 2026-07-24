@@ -41,13 +41,13 @@ const ConversationList: React.FC = () => {
               padding: '10px 12px',
               cursor: 'pointer',
               borderRadius: '10px',
-              backgroundColor: isActive ? '#e6f4ff' : 'transparent',
+              backgroundColor: isActive ? '#F3E7DF' : 'transparent',
               border: 'none',
               marginBottom: '2px',
               transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => {
-              if (!isActive) e.currentTarget.style.backgroundColor = '#f0f0f0';
+              if (!isActive) e.currentTarget.style.backgroundColor = '#ECE7DD';
             }}
             onMouseLeave={(e) => {
               if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
@@ -66,7 +66,7 @@ const ConversationList: React.FC = () => {
                   strong={isActive}
                   title={conversation.firstMessage}
                   style={{
-                    color: isActive ? '#1677ff' : '#262626',
+                    color: isActive ? '#BC6E4E' : '#3A3733',
                     fontSize: '13px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
