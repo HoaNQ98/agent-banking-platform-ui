@@ -21,7 +21,7 @@ interface FieldReviewCardProps {
 const STATUS_CONFIG: Record<FieldStatus, { label: string; color: string; bg: string; pillBg: string }> = {
   CRITICAL: { label: 'Must Fix',      color: '#ff4d4f', bg: '#fff2f0', pillBg: '#ff4d4f' },
   WARNING:  { label: 'Should Fix',    color: '#faad14', bg: '#fffbe6', pillBg: '#faad14' },
-  INFO:     { label: 'Best Practice', color: '#1890ff', bg: '#e6f7ff', pillBg: '#1890ff' },
+  INFO:     { label: 'Best Practice', color: '#3E7A78', bg: '#E6F0EF', pillBg: '#3E7A78' },
   OK:       { label: 'No Issue',      color: '#52c41a', bg: '#f6ffed', pillBg: '#52c41a' },
 };
 
@@ -62,7 +62,7 @@ function FieldValue({ value }: { value: unknown }) {
             <Text type="secondary" style={{ fontSize: 11, fontFamily: 'monospace', lineHeight: '20px', flexShrink: 0, userSelect: 'none' }}>
               [{i + 1}]
             </Text>
-            <Text style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', lineHeight: '20px', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+            <Text style={{ fontSize: 13, color: '#3A3733', wordBreak: 'break-word', lineHeight: '20px', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
               {String(item)}
             </Text>
           </div>
@@ -78,8 +78,8 @@ function FieldValue({ value }: { value: unknown }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 2 }}>
         {entries.map(([k, v]) => (
           <div key={k}>
-            <FieldLabel name={k} style={{ fontSize: 11, display: 'block', marginBottom: 2, color: '#8c8c8c' }} />
-            <div style={{ fontSize: 13, color: '#262626', textAlign: 'justify', hyphens: 'auto', wordBreak: 'break-word' } as React.CSSProperties}>
+            <FieldLabel name={k} style={{ fontSize: 11, display: 'block', marginBottom: 2, color: '#8A8578' }} />
+            <div style={{ fontSize: 13, color: '#3A3733', textAlign: 'justify', hyphens: 'auto', wordBreak: 'break-word' } as React.CSSProperties}>
               {String(v)}
             </div>
           </div>
@@ -89,7 +89,7 @@ function FieldValue({ value }: { value: unknown }) {
   }
 
   return (
-    <Text style={{ fontSize: 13, color: '#262626', wordBreak: 'break-word', whiteSpace: 'pre-wrap', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+    <Text style={{ fontSize: 13, color: '#3A3733', wordBreak: 'break-word', whiteSpace: 'pre-wrap', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
       {String(value)}
     </Text>
   );
@@ -142,7 +142,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
     const okLabel = (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <CheckCircleFilled style={{ color: config.color, fontSize: 13, flexShrink: 0 }} />
-        <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#595959' }} />
+        <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#6B665C' }} />
       </div>
     );
     return (
@@ -152,7 +152,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
           expandIcon={() => null}
           style={{
             background: '#fff',
-            border: '1px solid #f0f0f0',
+            border: '1px solid #EDE9E1',
             borderRadius: 10,
             outline: isActive ? `2px solid ${config.color}` : undefined,
           }}
@@ -192,7 +192,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
             >
               {config.label.toUpperCase()}
             </span>
-            <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#1a1a1a', fontWeight: 600 }} />
+            <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#3A3733', fontWeight: 600 }} />
           </div>
           <FieldValue value={field.fieldValue} />
         </div>
@@ -202,15 +202,15 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
           {field.issue && (
             <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
               <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
-              <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+              <Text style={{ fontSize: 13, color: '#6B665C', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
                 {field.issue}
               </Text>
             </div>
           )}
           {field.recommendation && (
             <div style={{ display: 'flex', gap: 6 }}>
-              <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
-              <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+              <BulbOutlined style={{ color: '#3E7A78', marginTop: 2, flexShrink: 0 }} />
+              <Text style={{ fontSize: 13, color: '#6B665C', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
                 {field.recommendation}
               </Text>
             </div>
@@ -238,7 +238,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
       >
         {config.label.toUpperCase()}
       </span>
-      <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#262626' }} />
+      <FieldLabel name={field.fieldName} style={{ fontSize: 13, color: '#3A3733' }} />
     </div>
   );
 
@@ -248,15 +248,15 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
       {field.issue && (
         <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
           <WarningOutlined style={{ color: config.color, marginTop: 2, flexShrink: 0 }} />
-          <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+          <Text style={{ fontSize: 13, color: '#6B665C', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
             {field.issue}
           </Text>
         </div>
       )}
       {field.recommendation && (
         <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-          <BulbOutlined style={{ color: '#1890ff', marginTop: 2, flexShrink: 0 }} />
-          <Text style={{ fontSize: 13, color: '#595959', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
+          <BulbOutlined style={{ color: '#3E7A78', marginTop: 2, flexShrink: 0 }} />
+          <Text style={{ fontSize: 13, color: '#6B665C', textAlign: 'justify', hyphens: 'auto' } as React.CSSProperties}>
             {field.recommendation}
           </Text>
         </div>
@@ -273,7 +273,7 @@ const FieldReviewCard: React.FC<FieldReviewCardProps> = ({ field, isActive, onSo
           borderLeft: `3px solid ${config.color}`,
           borderRadius: 10,
           background: '#fff',
-          border: '1px solid #f0f0f0',
+          border: '1px solid #EDE9E1',
           outline: isActive ? `2px solid ${config.color}` : undefined,
         }}
         items={[{ key: 'detail', label: collapseLabel, children: collapseContent }]}

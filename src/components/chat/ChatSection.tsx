@@ -47,12 +47,12 @@ const ChatSection: React.FC = () => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: '#fafafa',
+        background: '#FAF9F6',
         overflow: 'hidden',
       }}
     >
       {/* Header — masks messages as they scroll behind it */}
-      <div style={{ flexShrink: 0, height: '24px', background: '#fafafa', zIndex: 10 }} />
+      <div style={{ flexShrink: 0, height: '24px', background: '#FAF9F6', zIndex: 10 }} />
 
       {/* Scrollable area — same max-width column */}
       <div
@@ -85,7 +85,7 @@ const ChatSection: React.FC = () => {
                 alignItems: 'center',
                 gap: '12px',
                 height: '200px',
-                color: '#8c8c8c',
+                color: '#8A8578',
                 fontSize: '14px',
               }}
             >
@@ -110,19 +110,17 @@ const ChatSection: React.FC = () => {
               <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <span
                   style={{
-                    fontSize: '36px',
-                    fontWeight: 700,
-                    background: 'linear-gradient(135deg, #1a1a2e 0%, #1677ff 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    letterSpacing: '-0.5px',
+                    fontSize: '34px',
+                    fontWeight: 500,
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    color: '#3A3733',
+                    letterSpacing: '0.2px',
                     lineHeight: 1.2,
                   }}
                 >
                   {getGreeting()}
                 </span>
-                <span style={{ fontSize: '15px', color: '#8c8c8c', fontWeight: 400 }}>
+                <span style={{ fontSize: '15px', color: '#8A8578', fontWeight: 400 }}>
                   How can I help you today?
                 </span>
               </div>
@@ -141,14 +139,14 @@ const ChatSection: React.FC = () => {
                       gap: '8px',
                       padding: '10px 16px',
                       borderRadius: '12px',
-                      border: hoveredSuggestion === i ? '1.5px solid #91caff' : '1.5px solid #e8e8e8',
-                      background: hoveredSuggestion === i ? '#f0f7ff' : '#fff',
-                      color: hoveredSuggestion === i ? '#1677ff' : '#595959',
+                      border: hoveredSuggestion === i ? '1.5px solid #DDBBA6' : '1.5px solid #E4DFD5',
+                      background: hoveredSuggestion === i ? '#F6ECE4' : '#FFFDFA',
+                      color: hoveredSuggestion === i ? '#BC6E4E' : '#6B665C',
                       fontSize: '13px',
                       fontWeight: 450,
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
-                      boxShadow: hoveredSuggestion === i ? '0 2px 8px rgba(22,119,255,0.1)' : '0 1px 3px rgba(0,0,0,0.04)',
+                      boxShadow: hoveredSuggestion === i ? '0 2px 8px rgba(188,110,78,0.10)' : '0 1px 3px rgba(60,45,30,0.04)',
                       userSelect: 'none',
                     }}
                   >
@@ -171,7 +169,7 @@ const ChatSection: React.FC = () => {
             bottom: 0,
             paddingBottom: '32px',
             paddingTop: '8px',
-            background: 'linear-gradient(to bottom, transparent, #fafafa 20px)',
+            background: 'linear-gradient(to bottom, transparent, #FAF9F6 20px)',
           }}
         >
           <ChatInput />

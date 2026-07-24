@@ -16,12 +16,31 @@
     padding: 0;
     min-width: 320px;
     min-height: 100vh;
-    background-color: #F9FAFB;
-    color: #111827;
+    background-color: #FAF9F6;
+    color: #3A3733;
   }
 
   * {
     box-sizing: border-box;
+  }
+
+  /* Warm global scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #D6D0C4;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C3BCAC;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
@@ -33,16 +52,16 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #F3F4F6;
+    background: #F5F3EE;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #0047AB;
+    background: #D6D0C4;
     border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #002D6B;
+    background: #C3BCAC;
   }
 
   /* Markdown content styling */
@@ -77,7 +96,7 @@
   .loading-dots span {
     width: 8px;
     height: 8px;
-    background-color: #4B5563;
+    background-color: #8A8578;
     border-radius: 50%;
     animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
@@ -94,9 +113,9 @@
   .shimmer {
     background: linear-gradient(
       90deg,
-      #F3F4F6 0%,
-      #E5E7EB 50%,
-      #F3F4F6 100%
+      #F0ECE3 0%,
+      #E4DFD5 50%,
+      #F0ECE3 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;

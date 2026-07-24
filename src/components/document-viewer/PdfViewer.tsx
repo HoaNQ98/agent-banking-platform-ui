@@ -80,15 +80,15 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ src, pageIndex = 0, highlights, l
       <div
         style={{
           padding: '10px 16px',
-          borderBottom: '1px solid #f0f0f0',
-          background: '#fafafa',
+          borderBottom: '1px solid #EDE9E1',
+          background: '#F5F3EE',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
           flexShrink: 0,
         }}
       >
-        <FileTextOutlined style={{ color: '#1890ff' }} />
+        <FileTextOutlined style={{ color: '#BC6E4E' }} />
         <Text style={{ fontSize: 13, flex: 1 }} ellipsis>
           {label ?? src}
         </Text>
@@ -105,7 +105,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ src, pageIndex = 0, highlights, l
           justifyContent: 'center',
           alignItems: viewerState === 'loading' ? 'center' : 'flex-start',
           padding: '16px',
-          background: '#f5f5f5',
+          background: '#F0ECE3',
         }}
       >
         {viewerState === 'loading' && <Spin size="large" />}

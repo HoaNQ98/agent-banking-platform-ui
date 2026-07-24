@@ -62,7 +62,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
       <div
         style={{
           position: 'relative',
-          background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 55%, #13c2c2 100%)',
+          background: 'linear-gradient(135deg, #A85E3E 0%, #C67A54 55%, #C9A05E 100%)',
           padding: '20px 24px 18px',
           display: 'flex',
           alignItems: 'center',
@@ -146,12 +146,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
         >
           <Form.Item
             name="username"
-            label={<Text style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Username</Text>}
+            label={<Text style={{ fontSize: '12px', fontWeight: 600, color: '#5C574E' }}>Username</Text>}
             rules={[{ required: true, message: 'Please enter your username' }]}
             style={{ marginBottom: '10px' }}
           >
             <Input
-              prefix={<UserOutlined style={{ color: '#9CA3AF', fontSize: '13px' }} />}
+              prefix={<UserOutlined style={{ color: '#A8A296', fontSize: '13px' }} />}
               placeholder="Enter your username"
               autoComplete="username"
               style={{ borderRadius: '7px', height: '38px', fontSize: '14px' }}
@@ -160,15 +160,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
           <Form.Item
             name="password"
-            label={<Text style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Password</Text>}
+            label={<Text style={{ fontSize: '12px', fontWeight: 600, color: '#5C574E' }}>Password</Text>}
             rules={[{ required: true, message: 'Please enter your password' }]}
             style={{ marginBottom: '16px' }}
           >
             <Input.Password
-              prefix={<LockOutlined style={{ color: '#9CA3AF', fontSize: '13px' }} />}
+              prefix={<LockOutlined style={{ color: '#A8A296', fontSize: '13px' }} />}
               placeholder="Enter your password"
               autoComplete="current-password"
-              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              iconRender={(visible) => (visible ? <EyeTwoTone twoToneColor="#BC6E4E" /> : <EyeInvisibleOutlined />)}
               style={{ borderRadius: '7px', height: '38px', fontSize: '14px' }}
             />
           </Form.Item>
@@ -183,9 +183,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
               borderRadius: '7px',
               fontSize: '14px',
               fontWeight: 600,
-              background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 100%)',
+              background: 'linear-gradient(135deg, #A85E3E 0%, #C67A54 100%)',
               border: 'none',
-              boxShadow: '0 3px 10px rgba(0, 71, 171, 0.28)',
+              boxShadow: '0 3px 10px rgba(168, 94, 62, 0.28)',
             }}
           >
             {loading ? 'Signing in…' : 'Sign In'}
@@ -194,15 +194,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
         <div style={{ marginTop: '14px', textAlign: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <div style={{ flex: 1, height: '1px', background: '#E5E7EB' }} />
-            <Text style={{ color: '#9CA3AF', fontSize: '11px' }}>or</Text>
-            <div style={{ flex: 1, height: '1px', background: '#E5E7EB' }} />
+            <div style={{ flex: 1, height: '1px', background: '#E4DFD5' }} />
+            <Text style={{ color: '#A8A296', fontSize: '11px' }}>or</Text>
+            <div style={{ flex: 1, height: '1px', background: '#E4DFD5' }} />
           </div>
           <Button
             type="text"
             onClick={handleClose}
             disabled={loading}
-            style={{ color: '#6B7280', fontSize: '12px', height: 'auto', padding: '2px 0' }}
+            style={{ color: '#6B665C', fontSize: '12px', height: 'auto', padding: '2px 0' }}
           >
             Continue without signing in
           </Button>

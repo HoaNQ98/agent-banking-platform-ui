@@ -26,11 +26,11 @@ function formatDateTime(iso: string): string {
 }
 
 const MetaRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid #f5f5f5' }}>
+  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid #F0ECE3' }}>
     <Text type="secondary" style={{ fontSize: '12px', fontWeight: 600, minWidth: '110px', flexShrink: 0, paddingTop: '1px' }}>
       {label}
     </Text>
-    <div style={{ fontSize: '13px', color: '#262626', flex: 1 }}>{children}</div>
+    <div style={{ fontSize: '13px', color: '#3A3733', flex: 1 }}>{children}</div>
   </div>
 );
 
@@ -66,7 +66,7 @@ const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({ ticketId, onClo
       {/* Gradient header — matches LoginModal / brand pattern */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #0047AB 0%, #1890ff 55%, #13c2c2 100%)',
+          background: 'linear-gradient(135deg, #A85E3E 0%, #C67A54 55%, #C9A05E 100%)',
           padding: '20px 24px',
           display: 'flex',
           alignItems: 'flex-start',
@@ -155,7 +155,7 @@ const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({ ticketId, onClo
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.6px',
-                  color: '#8c8c8c',
+                  color: '#8A8578',
                   marginBottom: '10px',
                   display: 'flex',
                   alignItems: 'center',
@@ -166,7 +166,7 @@ const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({ ticketId, onClo
               </div>
               <MetaRow label="Name">{ticket.senderName || '—'}</MetaRow>
               <MetaRow label="Email">
-                <a href={`mailto:${ticket.senderEmail}`} style={{ color: '#1677ff' }}>
+                <a href={`mailto:${ticket.senderEmail}`} style={{ color: '#BC6E4E' }}>
                   {ticket.senderEmail}
                 </a>
               </MetaRow>
@@ -182,7 +182,7 @@ const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({ ticketId, onClo
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.6px',
-                  color: '#8c8c8c',
+                  color: '#8A8578',
                   marginBottom: '10px',
                   display: 'flex',
                   alignItems: 'center',
@@ -207,7 +207,7 @@ const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({ ticketId, onClo
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.6px',
-                  color: '#8c8c8c',
+                  color: '#8A8578',
                   marginBottom: '10px',
                 }}
               >
@@ -228,7 +228,7 @@ const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({ ticketId, onClo
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.6px',
-                  color: '#8c8c8c',
+                  color: '#8A8578',
                   marginBottom: '10px',
                   display: 'flex',
                   alignItems: 'center',
