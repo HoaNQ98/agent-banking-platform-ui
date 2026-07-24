@@ -5,7 +5,6 @@ import { QUICK_SUGGESTIONS } from '../../constants';
 import { useConversationStream } from '../../hooks/useConversationStream';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
-import EmptyChat from './EmptyChat';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -38,7 +37,7 @@ const ChatSection: React.FC = () => {
   }, [currentMessages]);
 
   if (!activeConversationId) {
-    return <EmptyChat />;
+    return null;
   }
 
   return (

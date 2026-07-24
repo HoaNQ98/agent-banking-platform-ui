@@ -12,11 +12,24 @@ export interface FileAttachment {
 }
 
 /**
- * Thinking process for tracking all subagent execution
- * (Similar to Google Gemini's "Thoughts" panel)
+ * A single agent/step in the pipeline, rendered as one timeline row.
+ * State transitions mutate the row rather than appending new log lines.
+ */
+export interface ThinkingStep {
+  key: string;            // stable id — the step name from the backend, e.g. "extraction"
+  label: string;          // display name, e.g. "Extraction"
+  status: 'active' | 'done' | 'failed';
+  summary?: string;       // optional detail shown beneath the row on completion
+  index?: number;         // 1-based position in the pipeline
+  total?: number;         // total steps in the pipeline
+}
+
+/**
+ * Thinking process for tracking multi-agent pipeline execution,
+ * rendered as a Claude-style vertical timeline (one row per agent/step).
  */
 export interface ThinkingProcess {
-  content: string; // Accumulated text from all subagents
+  steps: ThinkingStep[];  // ordered pipeline steps
   status: 'in_progress' | 'completed';
   startTime: Date;
   endTime?: Date;
