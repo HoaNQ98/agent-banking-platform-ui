@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { AppState, Conversation, Message, ExtractedField, ProcessedFile, AgentStatus } from '../types';
+import type { AppState, Conversation, Message, ExtractedField, ProcessedFile, AgentStatus, ThinkingStep } from '../types';
 import { generateId } from '../utils';
 import { ConversationService } from '../api/services/conversations';
 import type { ConversationItem } from '../api/types';
@@ -33,7 +33,16 @@ interface AppStore extends AppState, ConversationListState {
 
   // Thinking Process Actions
   startThinking: (conversationId: string, messageId: string) => void;
-  appendThinking: (conversationId: string, messageId: string, text: string) => void;
+  startThinkingStep: (
+    conversationId: string,
+    messageId: string,
+    step: { key: string; label: string; index?: number; total?: number }
+  ) => void;
+  completeThinkingStep: (
+    conversationId: string,
+    messageId: string,
+    step: { key: string; summary?: string; failed?: boolean }
+  ) => void;
   completeThinking: (conversationId: string, messageId: string) => void;
 
   // Review Actions
@@ -314,7 +323,7 @@ export const useAppStore = create<AppStore>()(
                 ? {
                     ...msg,
                     thinkingProcess: {
-                      content: '',
+                      steps: [],
                       status: 'in_progress' as const,
                       startTime: new Date(),
                     },
@@ -325,21 +334,53 @@ export const useAppStore = create<AppStore>()(
         }));
       },
 
-      appendThinking: (conversationId: string, messageId: string, text: string) => {
+      // Begin a step — append a new 'active' row, or reactivate an existing key.
+      startThinkingStep: (conversationId, messageId, step) => {
         set((state) => ({
           messages: {
             ...state.messages,
-            [conversationId]: state.messages[conversationId]?.map((msg) =>
-              msg.id === messageId && msg.thinkingProcess
-                ? {
-                    ...msg,
-                    thinkingProcess: {
-                      ...msg.thinkingProcess,
-                      content: msg.thinkingProcess.content + text,
+            [conversationId]: state.messages[conversationId]?.map((msg) => {
+              if (msg.id !== messageId || !msg.thinkingProcess) return msg;
+              const existing = msg.thinkingProcess.steps;
+              const alreadyThere = existing.some((s) => s.key === step.key);
+              const steps = alreadyThere
+                ? existing.map((s) =>
+                    s.key === step.key ? { ...s, status: 'active' as const } : s
+                  )
+                : [
+                    ...existing,
+                    {
+                      key: step.key,
+                      label: step.label,
+                      status: 'active' as const,
+                      index: step.index,
+                      total: step.total,
                     },
-                  }
-                : msg
-            ),
+                  ];
+              return { ...msg, thinkingProcess: { ...msg.thinkingProcess, steps } };
+            }),
+          },
+        }));
+      },
+
+      // Finish a step — mark its row done/failed and attach an optional summary.
+      completeThinkingStep: (conversationId, messageId, step) => {
+        set((state) => ({
+          messages: {
+            ...state.messages,
+            [conversationId]: state.messages[conversationId]?.map((msg) => {
+              if (msg.id !== messageId || !msg.thinkingProcess) return msg;
+              const steps = msg.thinkingProcess.steps.map((s) =>
+                s.key === step.key
+                  ? {
+                      ...s,
+                      status: (step.failed ? 'failed' : 'done') as ThinkingStep['status'],
+                      summary: step.summary || s.summary,
+                    }
+                  : s
+              );
+              return { ...msg, thinkingProcess: { ...msg.thinkingProcess, steps } };
+            }),
           },
         }));
       },

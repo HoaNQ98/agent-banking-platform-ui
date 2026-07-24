@@ -23,6 +23,15 @@ interface StreamState {
   uploadedFiles: UploadedFileInfo[];
 }
 
+/** Turn a backend step key ("lc_financial", "extraction") into a display label. */
+function formatStepLabel(step: string): string {
+  if (!step) return 'Step';
+  return step
+    .split(/[_\s]+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
 export const useConversationStream = (options: UseConversationStreamOptions = {}) => {
   const [state, setState] = useState<StreamState>({
     isStreaming: false,
@@ -30,7 +39,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
     uploadedFiles: [],
   });
 
-  const { addMessage, updateMessage, startThinking, appendThinking, completeThinking, messages, prependRemoteConversation, setFormBuilderOpen, setReviewData, setProcessedFiles } = useAppStore();
+  const { addMessage, updateMessage, startThinking, startThinkingStep, completeThinkingStep, completeThinking, messages, prependRemoteConversation, setFormBuilderOpen, setReviewData, setProcessedFiles } = useAppStore();
   const currentMessageIdRef = useRef<string | null>(null);
   const accumulatedTextRef = useRef<string>('');
   const isThinkingStartedRef = useRef<boolean>(false);
@@ -104,83 +113,68 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
 
         case 'files_uploaded':
           // Files successfully uploaded
-          if (event.files_uploaded) {
+          if (event.filesUploaded) {
             setState((prev) => ({
               ...prev,
-              uploadedFiles: event.files_uploaded || [],
+              uploadedFiles: event.filesUploaded || [],
             }));
           }
           break;
 
         case 'text_delta':
           if (event.delta && currentMessageIdRef.current) {
-            const isIntermediate = event.metadata?.pipeline_intermediate === true;
-
-            if (isIntermediate) {
-              // Pipeline steps 1-4: stream into ThinkingPanel, not main chat
-              if (!isThinkingStartedRef.current) {
-                startThinking(conversationId, currentMessageIdRef.current);
-                isThinkingStartedRef.current = true;
-              }
-              appendThinking(conversationId, currentMessageIdRef.current, event.delta);
-            } else {
-              // Normal response or pipeline final step: render in main chat
-              const source = event.source || 'orchestrator';
-              accumulatedTextRef.current += event.delta;
-              updateMessage(conversationId, currentMessageIdRef.current, {
-                content: accumulatedTextRef.current,
-                type: 'text',
-                metadata: {
-                  isStreaming: true,
-                  source,
-                  agentName: getAgentDisplayName(source),
-                  agentIcon: getAgentIcon(source),
-                },
-              });
-            }
+            // Orchestrator only streams the final advice / top-level tokens here.
+            // Pipeline steps 1-4 are suppressed at the source and never arrive.
+            const source = event.source || 'orchestrator';
+            accumulatedTextRef.current += event.delta;
+            updateMessage(conversationId, currentMessageIdRef.current, {
+              content: accumulatedTextRef.current,
+              type: 'text',
+              metadata: {
+                isStreaming: true,
+                source,
+                agentName: getAgentDisplayName(source),
+                agentIcon: getAgentIcon(source),
+              },
+            });
           }
           break;
 
         case 'pipeline_step_start':
-          // Show step progress in ThinkingPanel
+          // Begin a new timeline row for this step
           if (currentMessageIdRef.current) {
             if (!isThinkingStartedRef.current) {
               startThinking(conversationId, currentMessageIdRef.current);
               isThinkingStartedRef.current = true;
             }
             const stepName = event.step || '';
-            const stepLabel = stepName.charAt(0).toUpperCase() + stepName.slice(1);
-            appendThinking(
-              conversationId,
-              currentMessageIdRef.current,
-              `\n⏳ Step ${event.step_index}/${event.total_steps} — ${stepLabel}...\n`
-            );
+            startThinkingStep(conversationId, currentMessageIdRef.current, {
+              key: stepName,
+              label: formatStepLabel(stepName),
+              index: event.stepIndex,
+              total: event.totalSteps,
+            });
           }
           break;
 
         case 'pipeline_step_complete':
-          // Mark step done in ThinkingPanel
+          // Mark the step's row done, attaching its summary
           if (currentMessageIdRef.current) {
-            const stepName = event.step || '';
-            const stepLabel = stepName.charAt(0).toUpperCase() + stepName.slice(1);
-            appendThinking(
-              conversationId,
-              currentMessageIdRef.current,
-              `✓ Step ${event.step_index}/${event.total_steps} — ${stepLabel} complete\n`
-            );
+            completeThinkingStep(conversationId, currentMessageIdRef.current, {
+              key: event.step || '',
+              summary: event.content,
+            });
           }
           break;
 
         case 'pipeline_step_failed':
-          // Mark step failed in ThinkingPanel
+          // Mark the step's row failed
           if (currentMessageIdRef.current) {
-            const stepName = event.step || '';
-            const stepLabel = stepName.charAt(0).toUpperCase() + stepName.slice(1);
-            appendThinking(
-              conversationId,
-              currentMessageIdRef.current,
-              `✗ Step ${event.step_index}/${event.total_steps} — ${stepLabel} failed\n`
-            );
+            completeThinkingStep(conversationId, currentMessageIdRef.current, {
+              key: event.step || '',
+              summary: event.content,
+              failed: true,
+            });
           }
           break;
 
@@ -203,18 +197,6 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
               },
             });
             setFormBuilderOpen(true);
-          }
-          break;
-
-        case 'tool_result':
-          // Non-pipeline internal tool results — display in ThinkingPanel
-          if (event.content && currentMessageIdRef.current) {
-            if (!isThinkingStartedRef.current) {
-              startThinking(conversationId, currentMessageIdRef.current);
-              isThinkingStartedRef.current = true;
-            }
-            const agentName = event.agent || 'agent';
-            appendThinking(conversationId, currentMessageIdRef.current, `[${agentName}] ${event.content}`);
           }
           break;
 
@@ -245,19 +227,19 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
                 : undefined;
 
             updateMessage(conversationId, currentMessageIdRef.current, {
-              content: event.full_message || accumulatedTextRef.current,
+              content: event.fullMessage || accumulatedTextRef.current,
               type: 'text',
               attachments,
               metadata: {
                 ...event.metadata,
-                messageId: event.message_id,
+                messageId: event.messageId,
                 isStreaming: false, // Mark streaming as complete
               },
             });
           }
           break;
 
-        case 'error':
+        case 'error': {
           // Handle error from stream
           const errorMsg = event.error || 'An error occurred during streaming';
 
@@ -270,9 +252,10 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
           setState((prev) => ({ ...prev, error: errorMsg }));
           options.onError?.(new Error(errorMsg));
           break;
+        }
       }
     },
-    [addMessage, updateMessage, startThinking, appendThinking, completeThinking, setFormBuilderOpen, setReviewData, setProcessedFiles, state.uploadedFiles, options]
+    [addMessage, updateMessage, startThinking, startThinkingStep, completeThinkingStep, completeThinking, setFormBuilderOpen, setReviewData, setProcessedFiles, state.uploadedFiles, options]
   );
 
   /**

@@ -47,7 +47,6 @@ export type StreamEventType =
   | 'files_processing'
   | 'files_uploaded'
   | 'text_delta'
-  | 'tool_result'           // Internal tool results for "thinking process"
   | 'pipeline_step_start'   // Pipeline node started
   | 'pipeline_step_complete'// Pipeline node finished
   | 'pipeline_step_failed'  // Pipeline node failed
@@ -93,7 +92,6 @@ export interface EventMetadata {
  */
 export interface PipelineStepMetadata {
   pipeline_step?: string;       // "extraction" | "relationships" | "financial" | "regulations" | "advice"
-  pipeline_intermediate?: boolean; // true for steps 1-4 — route to ThinkingPanel, not main chat
   pipeline_final?: boolean;        // true for step 5 — route to main chat
   step_index?: number;             // 1-based
   [key: string]: any;
@@ -105,7 +103,6 @@ export interface PipelineStepMetadata {
 export interface ConversationStreamEvent {
   event: StreamEventType;
 
-  conversation_id?: string;
   conversationId?: string;
 
   // For text streaming (text_delta)
@@ -113,24 +110,21 @@ export interface ConversationStreamEvent {
   delta?: string;
   source?: StreamEventSource;
   node?: string;
-  is_subagent?: boolean;
+  isSubagent?: boolean;
   metadata?: PipelineStepMetadata & EventMetadata; // pipeline tags + other metadata
 
-  // For tool results (tool_result)
-  agent?: string;
-  content?: string;
-
-  // For pipeline step lifecycle (pipeline_step_start / pipeline_step_complete)
-  step?: string;       // step name e.g. "extraction"
-  step_index?: number; // 1-based
-  total_steps?: number;
+  // For pipeline step lifecycle (pipeline_step_start / pipeline_step_complete / pipeline_step_failed)
+  step?: string;      // step name e.g. "extraction"
+  stepIndex?: number; // 1-based
+  totalSteps?: number;
+  content?: string;   // step summary shown beneath the timeline row on completion
 
   // For file processing
-  files_uploaded?: UploadedFileInfo[];
+  filesUploaded?: UploadedFileInfo[];
 
   // For completion
-  message_id?: string;
-  full_message?: string;
+  messageId?: string;
+  fullMessage?: string;
 
   // For errors
   error?: string;
