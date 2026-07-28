@@ -33,17 +33,31 @@ const DocumentReviewPanel: React.FC = () => {
   const issueCount = criticalCount + warningCount;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#F5F3EE' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        borderRadius: 16,
+        border: '1px solid transparent',
+        background:
+          'linear-gradient(#FDFCFA, #FDFCFA) padding-box, ' +
+          'linear-gradient(135deg, #EFE9DD, #F5F1E9 45%, #E4DBCB) border-box',
+        overflow: 'hidden',
+        boxShadow: '0 8px 30px rgba(58, 55, 51, 0.10)',
+      }}
+    >
       {/* Header */}
       <div
         style={{
-          height: 44,
-          padding: '0 16px',
+          height: 48,
+          padding: '0 20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexShrink: 0,
-          borderBottom: '1px solid #EDE9E1',
+          background: '#FDFCFA',
+          borderBottom: '1px solid #EFE9DD',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -70,9 +84,9 @@ const DocumentReviewPanel: React.FC = () => {
             width: '42%',
             borderRight: '1px solid #EDE9E1',
             overflowY: 'auto',
-            padding: '12px 10px',
+            padding: '12px 12px',
             flexShrink: 0,
-            background: '#F5F3EE',
+            background: '#FDFCFA',
           }}
         >
           <span style={{ fontSize: 11, color: '#B7B0A3', display: 'block', marginBottom: 10, paddingLeft: 4 }}>
@@ -89,7 +103,7 @@ const DocumentReviewPanel: React.FC = () => {
         </div>
 
         {/* Right: document viewer — rounded inset */}
-        <div style={{ flex: 1, overflow: 'hidden', padding: '10px', background: '#F5F3EE' }}>
+        <div style={{ flex: 1, overflow: 'hidden', padding: '12px', background: '#FDFCFA' }}>
           <div style={{ height: '100%', borderRadius: 12, overflow: 'hidden', background: '#fff', border: '1px solid #EDE9E1' }}>
             {activeSource?.sourceType === 'regulation' && (() => {
               const path = getRegulationPath(activeSource.docName);
