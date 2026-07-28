@@ -148,7 +148,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ contentOverride }) => {
           style={{
             flex: isReviewOpen ? '0 0 67%' : '0 0 0%',
             overflow: 'hidden',
-            borderLeft: isReviewOpen ? '1px solid #EDE9E1' : 'none',
+            padding: isReviewOpen ? '8px' : 0,
+            background: '#FAF9F6',
             transform: isReviewOpen ? 'translateX(0)' : 'translateX(100%)',
             transition: 'flex 300ms ease, transform 300ms ease',
             minWidth: 0,
