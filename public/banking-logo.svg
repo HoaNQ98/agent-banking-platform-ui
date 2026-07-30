@@ -1,19 +1,24 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Banking building structure -->
-  <path d="M16 3L4 9v2h24V9L16 3z" fill="#1e40af"/>
+  <defs>
+    <linearGradient id="ba-warm" x1="4" y1="3" x2="28" y2="29" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C67A54"/>
+      <stop offset="0.55" stop-color="#B0894A"/>
+      <stop offset="1" stop-color="#C9A05E"/>
+    </linearGradient>
+  </defs>
 
-  <!-- Columns -->
-  <rect x="6" y="13" width="3" height="12" fill="#2563eb"/>
-  <rect x="11" y="13" width="3" height="12" fill="#2563eb"/>
-  <rect x="18" y="13" width="3" height="12" fill="#2563eb"/>
-  <rect x="23" y="13" width="3" height="12" fill="#2563eb"/>
+  <!-- Soft rounded backing tile -->
+  <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#ba-warm)"/>
 
-  <!-- Base -->
-  <rect x="3" y="25" width="26" height="3" fill="#1e40af"/>
+  <!-- Roof: soft rounded pediment -->
+  <path d="M16 7.5 8 11.5c-.5.25-.8.75-.8 1.3 0 .4.35.7.75.7h16.1c.4 0 .75-.3.75-.7 0-.55-.3-1.05-.8-1.3L16 7.5Z"
+        fill="#FFFFFF" fill-opacity="0.95"/>
 
-  <!-- Door -->
-  <rect x="14" y="18" width="4" height="7" fill="#1e293b"/>
+  <!-- Pillars: rounded, evenly spaced -->
+  <rect x="9.5"  y="15" width="2.4" height="7" rx="1.2" fill="#FFFFFF" fill-opacity="0.92"/>
+  <rect x="14.8" y="15" width="2.4" height="7" rx="1.2" fill="#FFFFFF" fill-opacity="0.92"/>
+  <rect x="20.1" y="15" width="2.4" height="7" rx="1.2" fill="#FFFFFF" fill-opacity="0.92"/>
 
-  <!-- Decorative elements - dollar sign -->
-  <circle cx="16" cy="8" r="1.5" fill="#fbbf24" opacity="0.9"/>
+  <!-- Base: soft rounded plinth -->
+  <rect x="7.5" y="23.2" width="17" height="2.4" rx="1.2" fill="#FFFFFF" fill-opacity="0.95"/>
 </svg>
