@@ -83,9 +83,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             flexShrink: 0,
           }}
         >
-          <span style={{ color: '#fff', fontWeight: 800, fontSize: '13px', letterSpacing: '-0.5px' }}>
-            BA
-          </span>
+          <img
+            src="/banking-logo.svg"
+            alt="Banking Agent"
+            width={24}
+            height={24}
+            style={{ display: 'block' }}
+          />
         </div>
 
         {/* Title + subtitle */}
