@@ -7,6 +7,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { ConversationService } from '../api/services/conversations';
+import { VISIBLE_STEP_KINDS } from '../api/types';
 import type { ConversationStreamEvent, UploadedFileInfo } from '../api/types';
 import { useAppStore } from '../store/useAppStore';
 import type { ExtractedField, ProcessedFile, FileAttachment } from '../types';
@@ -23,13 +24,16 @@ interface StreamState {
   uploadedFiles: UploadedFileInfo[];
 }
 
-/** Turn a backend step key ("lc_financial", "extraction") into a display label. */
-function formatStepLabel(step: string): string {
-  if (!step) return 'Step';
-  return step
-    .split(/[_\s]+/)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+/**
+ * Whether a step event should appear in the ThinkingPanel.
+ *
+ * The backend classifies each step; only user-facing kinds get a row. Events
+ * with no `kind` predate the field and are shown, so an older backend keeps
+ * working. Steps the backend considers internal (kind 'tool') are dropped here
+ * rather than in the panel, so they never enter the store at all.
+ */
+function isVisibleStep(event: ConversationStreamEvent): boolean {
+  return !event.kind || VISIBLE_STEP_KINDS.includes(event.kind);
 }
 
 export const useConversationStream = (options: UseConversationStreamOptions = {}) => {
@@ -142,7 +146,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
 
         case 'pipeline_step_start':
           // Begin a new timeline row for this step
-          if (currentMessageIdRef.current) {
+          if (currentMessageIdRef.current && isVisibleStep(event)) {
             if (!isThinkingStartedRef.current) {
               startThinking(conversationId, currentMessageIdRef.current);
               isThinkingStartedRef.current = true;
@@ -150,16 +154,19 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
             const stepName = event.step || '';
             startThinkingStep(conversationId, currentMessageIdRef.current, {
               key: stepName,
-              label: formatStepLabel(stepName),
+              // The backend owns the wording; fall back to the id only if an
+              // older backend sends no label.
+              label: event.label || stepName,
               index: event.stepIndex,
               total: event.totalSteps,
+              kind: event.kind,
             });
           }
           break;
 
         case 'pipeline_step_complete':
           // Mark the step's row done, attaching its summary
-          if (currentMessageIdRef.current) {
+          if (currentMessageIdRef.current && isVisibleStep(event)) {
             completeThinkingStep(conversationId, currentMessageIdRef.current, {
               key: event.step || '',
               summary: event.content,
@@ -169,7 +176,7 @@ export const useConversationStream = (options: UseConversationStreamOptions = {}
 
         case 'pipeline_step_failed':
           // Mark the step's row failed
-          if (currentMessageIdRef.current) {
+          if (currentMessageIdRef.current && isVisibleStep(event)) {
             completeThinkingStep(conversationId, currentMessageIdRef.current, {
               key: event.step || '',
               summary: event.content,

@@ -1,3 +1,5 @@
+import type { StepKind } from '../api/types';
+
 // Message Types
 export type MessageRole = 'user' | 'agent';
 
@@ -17,11 +19,12 @@ export interface FileAttachment {
  */
 export interface ThinkingStep {
   key: string;            // stable id — the step name from the backend, e.g. "extraction"
-  label: string;          // display name, e.g. "Extraction"
+  label: string;          // display name authored by the backend — rendered verbatim
   status: 'active' | 'done' | 'failed';
   summary?: string;       // optional detail shown beneath the row on completion
   index?: number;         // 1-based position in the pipeline
   total?: number;         // total steps in the pipeline
+  kind?: StepKind;        // 'agent' | 'pipeline' — what this row represents
 }
 
 /**

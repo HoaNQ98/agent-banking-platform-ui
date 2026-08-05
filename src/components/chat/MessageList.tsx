@@ -18,7 +18,15 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   const renderMessage = (message: Message) => {
     const isUser = message.role === 'user';
     const isLoading = message.type === 'loading';
-    const showLoadingDots = !isUser && (isLoading || (!message.content && !message.artifact && message.metadata?.isStreaming !== false));
+    // Once a thinking timeline exists it IS the progress indicator, so the dots
+    // give way to it. Without this the dots keep winning until the first token
+    // arrives, hiding a panel that was populated the moment the orchestrator
+    // handed off — the whole point of the handoff event is to show that gap.
+    const hasThinking = !!message.thinkingProcess;
+    const showLoadingDots =
+      !isUser &&
+      !hasThinking &&
+      (isLoading || (!message.content && !message.artifact && message.metadata?.isStreaming !== false));
 
     return (
       <div
@@ -136,11 +144,15 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                   <ThinkingPanel thinking={message.thinkingProcess} />
                 )}
 
-                <MarkdownMessage
-                  content={message.content}
-                  isUser={false}
-                  isStreaming={message.metadata?.isStreaming === true}
-                />
+                {/* No bubble until there is text — while the timeline is running
+                    the panel alone carries the progress. */}
+                {message.content && (
+                  <MarkdownMessage
+                    content={message.content}
+                    isUser={false}
+                    isStreaming={message.metadata?.isStreaming === true}
+                  />
+                )}
 
                 {/* Attachments */}
                 {message.attachments && message.attachments.length > 0 && (

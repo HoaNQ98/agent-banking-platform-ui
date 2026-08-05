@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware';
 import type { AppState, Conversation, Message, ExtractedField, ProcessedFile, AgentStatus, ThinkingStep } from '../types';
 import { generateId } from '../utils';
 import { ConversationService } from '../api/services/conversations';
-import type { ConversationItem } from '../api/types';
+import type { ConversationItem, StepKind } from '../api/types';
 
 interface ConversationListState {
   remoteConversations: ConversationItem[];
@@ -36,7 +36,7 @@ interface AppStore extends AppState, ConversationListState {
   startThinkingStep: (
     conversationId: string,
     messageId: string,
-    step: { key: string; label: string; index?: number; total?: number }
+    step: { key: string; label: string; index?: number; total?: number; kind?: StepKind }
   ) => void;
   completeThinkingStep: (
     conversationId: string,
@@ -355,6 +355,7 @@ export const useAppStore = create<AppStore>()(
                       status: 'active' as const,
                       index: step.index,
                       total: step.total,
+                      kind: step.kind,
                     },
                   ];
               return { ...msg, thinkingProcess: { ...msg.thinkingProcess, steps } };
