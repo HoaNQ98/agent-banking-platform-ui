@@ -56,6 +56,20 @@ export type StreamEventType =
   | 'error';
 
 /**
+ * What a timeline step represents, as classified by the backend.
+ *
+ * - 'agent'    — handoff to a specialist skill (user-facing work)
+ * - 'pipeline' — a stage of the LC processing pipeline (user-facing work)
+ * - 'tool'     — an internal orchestrator call such as load_skill. Machinery
+ *                rather than work the user asked for, so it is not rendered in
+ *                the timeline; see VISIBLE_STEP_KINDS.
+ */
+export type StepKind = 'agent' | 'pipeline' | 'tool';
+
+/** Step kinds that earn a row in the ThinkingPanel. */
+export const VISIBLE_STEP_KINDS: readonly StepKind[] = ['agent', 'pipeline'];
+
+/**
  * Source of the streaming event
  */
 export type StreamEventSource = 'orchestrator' | 'subagent';
@@ -114,10 +128,12 @@ export interface ConversationStreamEvent {
   metadata?: PipelineStepMetadata & EventMetadata; // pipeline tags + other metadata
 
   // For pipeline step lifecycle (pipeline_step_start / pipeline_step_complete / pipeline_step_failed)
-  step?: string;      // step name e.g. "extraction"
+  step?: string;      // stable id e.g. "extraction", or a skill name for a handoff
   stepIndex?: number; // 1-based
   totalSteps?: number;
   content?: string;   // step summary shown beneath the timeline row on completion
+  label?: string;     // display name authored by the backend — render verbatim
+  kind?: StepKind;    // what the step represents; drives whether it is shown at all
 
   // For file processing
   filesUploaded?: UploadedFileInfo[];
